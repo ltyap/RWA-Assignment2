@@ -35,7 +35,4 @@ end
 
 % induced velocity - from bound vortex
 u_ind = K*[r12x, r12y, r12z];
-
-% from straight trailing vortices
-
 end
