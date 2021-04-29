@@ -33,6 +33,9 @@ else
     K = gamma/(4*pi*r12_sqr)*(r01/r1-r02/r2);   
 end
 
-% induced velocity
+% induced velocity - from bound vortex
 u_ind = K*[r12x, r12y, r12z];
+
+% from straight trailing vortices
+
 end
