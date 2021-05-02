@@ -1,12 +1,9 @@
 % new iterative loop
-function [a, aline, r_R, Fnorm, Ftan, Gamma] = solveGamma(Uinf, N, Radius, cp, Influence_u, Influence_v, Influence_w, Omega, polar_alpha, polar_cl, polar_cd, cp_twist)
-%%%%%%%%%% variables for testing
-U_inf = [Uinf, 0, 0];
-Gamma=ones(N,1);
-%%%%%%%%%%
-GammaNew = Gamma; % initial guess
+function [a, aline, r_R, Fnorm, Ftan, Gamma_temp] = solveGamma(Uinf, N, Radius, cp, Influence_u, Influence_v, Influence_w, Omega, polar_alpha, polar_cl, polar_cd, cp_twist)
+GammaNew = ones(N,1); % initial guess
+U_inf = [Uinf,0,0];
 
-Niterations =1200;
+Niterations = 1200;
 errorlimit = 0.01;
 error = 1.0;
 
@@ -21,7 +18,8 @@ for i=1:Niterations
         
         % determine radial position of the controlpoint;
         r = cp(icp,2);  %   ??? not sure, mine
-        % r = sqrt(dot(cp(icp,:),cp(icp,:))); % this is from the tutorial
+        %cp(icp,1) = 0;   % calculate everything wrt to c/4
+        %r = sqrt(dot(cp(icp,:),cp(icp,:))); % this is from the tutorial
         
         u=0; % initialize velocity
         v=0;
@@ -35,18 +33,18 @@ for i=1:Niterations
         end
         
         % calculate total perceived velocity
-        vrot = cross([-Omega, 0 , 0]  , cp(icp,:) ); % rotational velocity
-        vel1 = [U_inf(1)+ u + vrot(1), U_inf(2)+ v + vrot(2) , U_inf(3)+ w + vrot(3)]; % total perceived velocity at section
+%         vrot = cross([-Omega, 0 , 0]  , cp(icp,:) ); % rotational velocity
+%         vel1 = [U_inf(1)+ u + vrot(1), U_inf(2)+ v + vrot(2) , U_inf(3)+ w + vrot(3)]; % total perceived velocity at section
         
         % calculate azimuthal and axial velocity
-        azimdir = cross([-1/r, 0 , 0]  , cp(icp,:)); % rotational direction
-        Utan = dot(azimdir, vel1); % azimuthal direction
-        Uaxial =  dot([1, 0, 0] , vel1); % axial velocity
+%         azimdir = cross([-1/r, 0 , 0]  , cp(icp,:)); % rotational direction
+%         Utan = dot(azimdir, vel1); % azimuthal direction
+%         Uaxial =  dot([1, 0, 0] , vel1); % axial velocity
         
         %gives different results - not sure, mine
-        %                 Uaxial = Uinf+u;
-        %                 Utan = Omega*r+dot([Uinf+u, v, w],[1,0,0]);
-        %                 Uper = sqrt(Uaxial^2+Utan^2); % for checking
+        Uaxial = Uinf+w;
+        Utan = Omega*r+u;%dot([Uinf+u, v, w],[1,0,0]);
+        Uper = sqrt(Uaxial^2+Utan^2); % for checking
         
         [fnorm , ftan, gamma, ~, ~] = loadBladeElement(r/Radius, cp(icp,1)*4, cp_twist(icp), polar_alpha, polar_cl, polar_cd, Uaxial, Utan);
         
@@ -54,12 +52,12 @@ for i=1:Niterations
         GammaNew(icp) = gamma;
         
         % update output vector
-        a(icp) = -(u + vrot(1))/U_inf(1);
+        a(icp) = 1-Uaxial/Uinf;
         aline(icp) = Utan/(r*Omega)-1;
         r_R(icp) = r/Radius ;
         Fnorm(icp) = fnorm ;
         Ftan(icp) = ftan ;
-        Gamma(icp) = gamma;
+        Gamma_temp(icp) = gamma;
     end % end loop control points
     
     % check convergence of solution
@@ -69,7 +67,8 @@ for i=1:Niterations
     error = error/ref_error; % relative error
     
     if error < errorlimit
-        kiter=Niterations;  % if error smaller than limit, stop iteration cycle
+        %kiter=Niterations;  % if error smaller than limit, stop iteration cycle
+        disp(['Number of iterations to convergence: ',num2str(i)]);
         break
     end
     
@@ -77,4 +76,8 @@ for i=1:Niterations
     GammaNew = 0.7*Gamma + 0.3*GammaNew;
     %GammaNew(ig) = (1-ConvWeight)*Gamma(ig) + ConvWeight*GammaNew(ig);
 end % end iteration loop
+
+if i==Niterations
+    disp("Solution not converged!");
+end
 end
