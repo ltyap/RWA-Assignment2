@@ -17,7 +17,7 @@ for i=1:Niterations
     for icp= 1:length(cp(:,1))
         
         % determine radial position of the controlpoint;
-        r = cp(icp,2);  %   ??? not sure, mine
+        r = cp(icp,3);  %   ??? not sure, mine
         %cp(icp,1) = 0;   % calculate everything wrt to c/4
         %r = sqrt(dot(cp(icp,:),cp(icp,:))); % this is from the tutorial
         
@@ -42,11 +42,11 @@ for i=1:Niterations
 %         Uaxial =  dot([1, 0, 0] , vel1); % axial velocity
         
         %gives different results - not sure, mine
-        Uaxial = Uinf+w;
-        Utan = Omega*r+u;%dot([Uinf+u, v, w],[1,0,0]);
+        Uaxial = Uinf+u;
+        Utan = Omega*r+v;%dot([Uinf+u, v, w],[1,0,0]);
         Uper = sqrt(Uaxial^2+Utan^2); % for checking
         
-        [fnorm , ftan, gamma, ~, ~] = loadBladeElement(r/Radius, cp(icp,1)*4, cp_twist(icp), polar_alpha, polar_cl, polar_cd, Uaxial, Utan);
+        [fnorm , ftan, gamma, ~, ~] = loadBladeElement(r/Radius, cp(icp,2)*4, cp_twist(icp), polar_alpha, polar_cl, polar_cd, Uaxial, Utan);
         
         % new point of new estimate of circulation for the blade section
         GammaNew(icp) = gamma;

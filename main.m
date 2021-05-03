@@ -31,15 +31,15 @@ pinf = 101300;  % atmospheric pressure
 TSR = 8;    %TSR_array =[6,8,10]; % tip speed ratios we want to calculate
 Radius = 50;    % blade Radius
 NBlades = 3;    % number of blades
-a_wake = 0;   % ,should be average induction at the rotor
+a_wake = 0.2602;   % ,should be average induction at the rotor, from BEM
 Uwake = Uinf*(1-a_wake);
 
 Omega = Uinf*TSR/Radius;
 Lw_D = 0.2;    % wake length in diameters downstream
 % determine trailing vortices
 for i=1:N+1
-    trail_x1 = chord_distribution(i)/4 + chord_distribution(i)*cos(deg2rad(-twist_distribution(i)));
-    trail_y1 = 0 + chord_distribution(i)*sin(deg2rad(-twist_distribution(i)));
+    trail_x1 = 0 + chord_distribution(i)*sin(deg2rad(-twist_distribution(i)));
+    trail_y1 = chord_distribution(i)/4 + chord_distribution(i)*cos(deg2rad(-twist_distribution(i)));
     trail_z1 = r_R(i)*Radius + 0;
     
     %ts_func = @(ts) sqrt(ts^2*Uwake^2+r_R(i)^2*Radius^2*sin(Omega*ts)^2+r_R(i)^2*Radius^2*cos(Omega*ts)^2)-chord_distribution(i) ;
@@ -50,24 +50,24 @@ for i=1:N+1
     y = r_R(i)*Radius*sin(Omega*t);
     z = r_R(i)*Radius*cos(Omega*t);
     trail_points.x(i,:) = [trail_x1, trail_x1+x];
-    trail_points.y(i,:) = [trail_y1, y]; %[trail_y1, trail_y1+y];
+    trail_points.y(i,:) = [trail_y1, trail_y1+y]; %[trail_y1, trail_y1+y];
     trail_points.z(i,:) = [trail_z1, z]; %[trail_z1, trail_z1+z];
 end
 
 % determine control point locations - at middle of segments
 c = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;  % local chord
-cp(:,1) = c/4; % x-coordinate
-cp(:,2) = zeros(N,1);     % y-coordinate
+cp(:,1) = zeros(N,1); % x-coordinate
+cp(:,2) = c/4;     % y-coordinate
 cp(:,3) = (r_R(1:end-1)+r_R(2:end))/2*Radius;     % z-coordinate
-cp_twist = interp1(r_R, twist_distribution, cp(:,2)/Radius);% twist at control points
+cp_twist = interp1(r_R, twist_distribution, cp(:,3)/Radius);% twist at control points
 
 %% determine induced velocity per unit strength of circulation (for Gamma=1)
 for i=1:length(cp(:,1))
     for j=1:length(r_R)-1
         induced_vel=[0,0,0];
         
-        point1 = [chord_distribution(j)/4,r_R(j)*Radius,0]; % coordinates of start of bound vortex
-        point2 = [chord_distribution(j+1),r_R(j+1)*Radius,0]; % coordinates of end of bound vortex
+        point1 = [0,chord_distribution(j)/4,r_R(j)*Radius]; % coordinates of start of bound vortex
+        point2 = [0,chord_distribution(j+1),r_R(j+1)*Radius]; % coordinates of end of bound vortex
         temp = induced_v_from_vortex(1,point1, point2, cp(i,:));
         induced_vel=induced_vel+temp;
         
@@ -96,19 +96,22 @@ for i=1:length(cp(:,1))
 end
 
 %% check if the system if set up correctly
-figure('visible', 'off')
+figure('visible', 'on')
 hold on
-plot3([zeros(1,N+1),flip(chord_distribution)], zeros(1,2*(N+1)), [r_R*Radius,flip(r_R*Radius)])% blade outline
+plot3( zeros(1,2*(N+1)), [zeros(1,N+1),flip(chord_distribution)], [r_R*Radius,flip(r_R*Radius)])% blade outline
 scatter3(cp(:,1), cp(:,2), cp(:,3), 15, 'r', 'filled')  % control points
-plot3(chord_distribution/4,zeros(1,N+1),r_R*Radius,'-+', 'Color', 'k')   % bound vortices
+plot3(zeros(1,N+1),chord_distribution/4,r_R*Radius,'-+', 'Color', 'k')   % bound vortices
 for i=1:N+1
-    plot3([chord_distribution(i)/4, trail_points.x(i,:)],[0,trail_points.y(i,:)], [r_R(i)*Radius,trail_points.z(i,:)], 'k')
+    plot3([0, trail_points.x(i,:)], [chord_distribution(i)/4,trail_points.y(i,:)],[r_R(i)*Radius,trail_points.z(i,:)], 'k')
 end
 % axis equal
+xlabel("x")
+ylabel("y")
+zlabel("z")
 hold off
 
 %% Calculate
-% why do we also have r_R as an output?
+%why do we also have r_R as an output?
 [a, aline, r_R, Fnorm, Ftan, Gamma] = solveGamma(Uinf, N, Radius, cp, Influence_u, Influence_v, Influence_w, Omega, polar_alpha, polar_cl, polar_cd, cp_twist);
 
 %% Post processing
