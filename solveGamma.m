@@ -1,10 +1,10 @@
 % new iterative loop
-function [a, aline, r_R, Fnorm, Ftan, Gamma_temp] = solveGamma(Uinf, N, Radius, cp, Influence_u, Influence_v, Influence_w, Omega, polar_alpha, polar_cl, polar_cd, cp_twist)
-GammaNew = ones(N,1); % initial guess
+function [a, aline, r_R, Fnorm, Ftan, Gamma_temp] = solveGamma(Uinf, N, Radius, cp, Influence_u, Influence_v, Influence_w, Omega, polar_alpha, polar_cl, polar_cd, chord_distribution)
+GammaNew = ones(length(cp.x),1); % initial guess, defined in control points
 U_inf = [Uinf,0,0];
 
-Niterations = 1200;
-errorlimit = 0.01;
+Niterations = 12000;
+errorlimit = 0.0001;
 error = 1.0;
 
 % Niterations = 10000;    % maximum number of performed iterations
@@ -14,39 +14,42 @@ for i=1:Niterations
     Gamma = GammaNew;%???? % update bound circulation
     
     % calculate velocity, circulation and loads at the controlpoints
-    for icp= 1:length(cp(:,1))
-        
+    for icp= 1:length(cp.x)% loop over all control points
+        local_cp = [cp.x(icp), cp.y(icp), cp.z(icp)];
         % determine radial position of the controlpoint;
-        r = cp(icp,3);  %   ??? not sure, mine
-        %cp(icp,1) = 0;   % calculate everything wrt to c/4
-        %r = sqrt(dot(cp(icp,:),cp(icp,:))); % this is from the tutorial
+        r = sqrt(dot(local_cp, local_cp));
+        % QUICK FIX - rewrite!
+        if icp<=N
+            local_c = (chord_distribution(icp)+chord_distribution(icp+1))/2; % local chord
+        elseif icp<=2*N
+            local_c = (chord_distribution(icp-N)+chord_distribution(icp+1-N))/2; % local chord
+        else
+            local_c = (chord_distribution(icp-2*N)+chord_distribution(icp+1-2*N))/2; % local chord
+        end
         
-        u=0; % initialize velocity
+        u=0; % initialize velocity at control point
         v=0;
         w=0;
         
         % multiply icp line of Matrix with vector of circulation Gamma to calculate velocity at controlpoint
-        for j = 1:length(N)
+        for j = 1:length(Influence_u(1,:)) % loop over all vortex rings
             u = u + Influence_u(icp,j)*Gamma(j); % axial component of velocity
             v = v + Influence_v(icp,j)*Gamma(j); % y-component of velocity
             w = w + Influence_w(icp,j)*Gamma(j); % z-component of velocity
         end
         
-        % calculate total perceived velocity
-%         vrot = cross([-Omega, 0 , 0]  , cp(icp,:) ); % rotational velocity
-%         vel1 = [U_inf(1)+ u + vrot(1), U_inf(2)+ v + vrot(2) , U_inf(3)+ w + vrot(3)]; % total perceived velocity at section
+        %         Uaxial = Uinf+u;
+        %         Utan = Omega*r+v;%dot([Uinf+u, v, w],[1,0,0]);
+                 Urot = cross([-Omega,0,0],local_cp);
+                 Urel = [Uinf+u+Urot(1), v+Urot(2), w+Urot(3)];
         
-        % calculate azimuthal and axial velocity
-%         azimdir = cross([-1/r, 0 , 0]  , cp(icp,:)); % rotational direction
-%         Utan = dot(azimdir, vel1); % azimuthal direction
-%         Uaxial =  dot([1, 0, 0] , vel1); % axial velocity
+                 azimdir = cross([-1/r, 0, 0]  , local_cp); % rotational direction
+                 Utan = dot(azimdir, Urel); % azimuthal direction
+                 Uaxial =  dot([1, 0, 0] , Urel); % axial velocity
+%         Uaxial = Uinf+u;
+%         Utan = Omega*r + dot([Uinf+u, v, w],azimdir);
         
-        %gives different results - not sure, mine
-        Uaxial = Uinf+u;
-        Utan = Omega*r+v;%dot([Uinf+u, v, w],[1,0,0]);
-        Uper = sqrt(Uaxial^2+Utan^2); % for checking
-        
-        [fnorm , ftan, gamma, ~, ~] = loadBladeElement(r/Radius, cp(icp,2)*4, cp_twist(icp), polar_alpha, polar_cl, polar_cd, Uaxial, Utan);
+        [fnorm , ftan, gamma, ~, ~] = loadBladeElement(r/Radius, local_c, cp.twist(icp), polar_alpha, polar_cl, polar_cd, Uaxial, Utan);
         
         % new point of new estimate of circulation for the blade section
         GammaNew(icp) = gamma;

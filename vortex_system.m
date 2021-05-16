@@ -1,5 +1,3 @@
-% FIX - double points in trail/ trail2
-% FIX - shift in points for trail2 not good
 function [cp, bound, trail]=vortex_system(Omega, NBlades, theta_array,N, r_R, Radius, twist_distribution, chord_distribution, Lw_D, Uwake)
 ts = 0.2; % maybe come up with a function for determining this
 t = [0:ts:Lw_D*2*Radius/Uwake];
@@ -11,13 +9,13 @@ for n=1:NBlades % loop over blades
     r = (r_R(1:end-1)+r_R(2:end))/2*Radius;
     cp.x((n-1)*N+1:n*N) = zeros(N,1); % x-coordinate
     cp.y((n-1)*N+1:n*N) = r*cos(2*pi-blade_azim);     % y-coordinate
-    cp.z((n-1)*N+1:n*N) = r*sin(2*pi-blade_azim)     % z-coordinate
+    cp.z((n-1)*N+1:n*N) = r*sin(2*pi-blade_azim);     % z-coordinate
     cp.twist((n-1)*N+1:n*N) = interp1(r_R, twist_distribution, r/Radius); % twist at control points
     
     % bound vortices
     bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1); % x-coordinate
     bound.y((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*cos(2*pi-blade_azim);     % y-coordinate
-    bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(2*pi-blade_azim)     % z-coordinate
+    bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(2*pi-blade_azim);     % z-coordinate
     
     %determine trailing vortices
     for i=1:N+1 % loop over bound vortices

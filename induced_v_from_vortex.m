@@ -23,11 +23,11 @@ r01 = sum((point2-point1).*(cp-point1));
 r02 = sum((point2-point1).*(cp-point2));
 
 % determine scalar
-if r12_sqr==0
+if abs(r12_sqr)<1e-13
     K=0;
-elseif r1==0
+elseif abs(r1)<1e-13
     K = gamma/(4*pi*r12_sqr)*(-r02/r2);
-elseif r2==0
+elseif abs(r2)<1e-13
     K = gamma/(4*pi*r12_sqr)*(r01/r1);
 else
     K = gamma/(4*pi*r12_sqr)*(r01/r1-r02/r2);   
