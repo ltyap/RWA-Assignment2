@@ -11,13 +11,13 @@ for n=1:NBlades % loop over blades
     % determine control point locations - at middle of segments
     r = (r_R(1:end-1)+r_R(2:end))/2*Radius;
     c1 = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;
-    cp.x((n-1)*N+1:n*N) = zeros(N,1)+(0.5*c1'); % x-coordinate
+    cp.x((n-1)*N+1:n*N) = zeros(N,1)+(0.5*c'); % x-coordinate
     cp.y((n-1)*N+1:n*N) = r*cos(2*pi-blade_azim);     % y-coordinate
     cp.z((n-1)*N+1:n*N) = r*sin(2*pi-blade_azim);     % z-coordinate
     cp.twist((n-1)*N+1:n*N) = interp1(r_R, twist_distribution, r/Radius); % twist at control points
     
     % bound vortices
-    bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1); % x-coordinate
+    bound.x((n-1)*(N+1)+1:n*(N+1)) = 0.25*c*ones(N+1,1); % x-coordinate
     bound.y((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*cos(2*pi-blade_azim);     % y-coordinate
     bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(2*pi-blade_azim);     % z-coordinate
     
@@ -28,9 +28,9 @@ for n=1:NBlades % loop over blades
         beta = -deg2rad(twist_distribution(i));
         
         % 1st trailing vortex, not sure about this
-        trailx((n-1)*(N+1)+i) = bound.x((n-1)*(N+1)+i)+0.75*c*cos(beta);
-        traily((n-1)*(N+1)+i) = bound.y((n-1)*(N+1)+i)-0.75*c*sin(beta)*sin(blade_azim);
-        trailz((n-1)*(N+1)+i) = bound.z((n-1)*(N+1)+i)+0.75*c*sin(beta)*cos(blade_azim);
+        trailx((n-1)*(N+1)+i) = bound.x((n-1)*(N+1)+i)+c*cos(beta);
+        traily((n-1)*(N+1)+i) = bound.y((n-1)*(N+1)+i)-c*sin(beta)*sin(blade_azim);
+        trailz((n-1)*(N+1)+i) = bound.z((n-1)*(N+1)+i)+c*sin(beta)*cos(blade_azim);
         
         x = t*Uwake;
         y = r_R(i)*Radius*sin(Omega*t+pi/2+blade_azim);

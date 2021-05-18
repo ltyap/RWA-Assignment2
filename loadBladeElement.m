@@ -2,7 +2,7 @@ function [fnorm , ftan, gamma, alpha, inflowangle] = loadBladeElement(r_R, chord
 % calculates the load in the blade element
 vmag2 = Uaxial.^2 + Utan.^2;    % square of resultant velocity
 inflowangle = atan2(Uaxial, Utan);  % calculate inflow angle
-alpha = twist + inflowangle*180/pi;     % calculate angle of attack
+alpha = twist + rad2deg(inflowangle);     % calculate angle of attack
 
 cl = interp1(polar_alpha, polar_cl, alpha);     % local cl from airfoil polars
 cd = interp1(polar_alpha, polar_cd, alpha);     % local cd from airfoil polars

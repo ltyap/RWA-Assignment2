@@ -3,7 +3,7 @@ function [a, aline, r_R, Fnorm, Ftan, Gamma_temp] = solveGamma(Uinf, N, Radius, 
 GammaNew = ones(length(cp.x),1); % initial guess, defined in control points
 U_inf = [Uinf,0,0];
 
-Niterations = 12000;
+Niterations = 100;
 errorlimit = 0.0001;
 error = 1.0;
 
