@@ -11,13 +11,13 @@ close all
 % blade discretisation
 TipLocation_R =  1;
 RootLocation_R =  0.2;
-N = 31; % number of segments
+N = 10; % number of segments
 
 % uniform distribution
 % delta_r_R = 0.01;
 % r_R = [0.2:delta_r_R:1];
 
-r_R = RadialSpacing(N, TipLocation_R, RootLocation_R);% cosine distribution for now
+[r_R, theta, b] = RadialSpacing(N, TipLocation_R, RootLocation_R);% cosine distribution for now
 [chord_distribution, twist_distribution] = BladeGeometry(r_R);
 %% flow conditions - same as in BEM model
 Uinf = 10;      % freestream velocity [m/s]
@@ -30,49 +30,44 @@ a_wake = 0.2602;   % ,should be average induction at the rotor, from BEM
 Uwake = Uinf*(1-a_wake);
 
 Omega = Uinf*TSR/Radius;
-Lw_D = 0.2;    % wake length in diameters downstream
+Lw_D = 0.5;    % wake length in diameters downstream
 
-% theta_array = [0:2*pi/NBlades:2*pi*(1-1/NBlades)]; % azimuthal positions of blades, assuming the first one is at 0
-% theta_array = linspace(0,2*pi,NBlades+1);
-% theta_array = theta_array(1:3);
 [cp, bound, trail]=vortex_system(Omega, NBlades, N, r_R, Radius, twist_distribution, chord_distribution, Lw_D, Uwake);
 
 %% determine induced velocity per unit strength of circulation (for Gamma=1)
 for i=1:length(cp.x) % take all control points
     local_cp = [cp.x(i), cp.y(i), cp.z(i)];
     for n=1:NBlades
-    for j=1:N
-        induced_vel=[0,0,0];
-        
-        % bound vortex influence
-        point1 = [bound.x((n-1)*N+j), bound.y((n-1)*N+j), bound.z((n-1)*N+j)]; % coordinates of start of bound vortex
-        point2 = [bound.x((n-1)*N+j+1), bound.y((n-1)*N+j+1), bound.z((n-1)*N+j+1)]; % coordinates of end of bound vortex
-        temp = induced_v_from_vortex(1,point1, point2, local_cp);
-        induced_vel=induced_vel+temp;
-        
-        % first trailing vortex
-        temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j,1),trail.y((n-1)*N+j,1),trail.z((n-1)*N+j,1)] ,point1, local_cp);
-        induced_vel = induced_vel+temp;
-        
-        
-        temp = induced_v_from_vortex(1, point2, [trail.x((n-1)*N+j+1,1),trail.y((n-1)*N+j+1,1),trail.z((n-1)*N+j+1,1)], local_cp);
-        induced_vel = induced_vel+temp;  
-        
-        for k=2:length(trail.x((n-1)*N+j,:))-1 % for the whole length of wake - positive circulation
-            temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j,k+1),trail.y((n-1)*N+j,k+1),trail.z((n-1)*N+j,k+1)] ,[trail.x((n-1)*N+j,k),trail.y((n-1)*N+j,k),trail.z((n-1)*N+j,k)], local_cp);
+        for j=1:N
+            induced_vel=[0,0,0];
+            % bound vortex influence
+            point1 = [bound.x((n-1)*N+j), bound.y((n-1)*N+j), bound.z((n-1)*N+j)]; % coordinates of start of bound vortex
+            point2 = [bound.x((n-1)*N+j+1), bound.y((n-1)*N+j+1), bound.z((n-1)*N+j+1)]; % coordinates of end of bound vortex
+            temp = induced_v_from_vortex(1, point1, point2, local_cp);
+            induced_vel=induced_vel+temp;
+
+            % first trailing vortex
+            temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j,1),trail.y((n-1)*N+j,1),trail.z((n-1)*N+j,1)] ,point1, local_cp);
             induced_vel = induced_vel+temp;
+
+            temp = induced_v_from_vortex(1, point2, [trail.x((n-1)*N+j+1,1),trail.y((n-1)*N+j+1,1),trail.z((n-1)*N+j+1,1)], local_cp);
+            induced_vel = induced_vel+temp;  
+
+            for k=2:length(trail.x((n-1)*N+j,:))-1 % for the whole length of wake - positive circulation
+                temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j,k+1),trail.y((n-1)*N+j,k+1),trail.z((n-1)*N+j,k+1)] ,[trail.x((n-1)*N+j,k),trail.y((n-1)*N+j,k),trail.z((n-1)*N+j,k)], local_cp);
+                induced_vel = induced_vel+temp;
+            end
+
+            for k=2:length(trail.x((n-1)*N+j,:))-1 % for the whole length of wake - negative circulation
+                temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j+1,k),trail.y((n-1)*N+j+1,k),trail.z((n-1)*N+j+1,k)] ,[trail.x((n-1)*N+j+1,k+1),trail.y((n-1)*N+j+1,k+1),trail.z((n-1)*N+j+1,k+1)], local_cp);
+                induced_vel = induced_vel+temp;
+            end
+
+            % write into influence matrix - for unit gamma
+            Influence_u(i,(n-1)*N+j) = induced_vel(1);
+            Influence_v(i,(n-1)*N+j) = induced_vel(2);
+            Influence_w(i,(n-1)*N+j) = induced_vel(3);
         end
-        
-        for k=2:length(trail.x((n-1)*N+j,:))-1 % for the whole length of wake - negative circulation
-            temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j+1,k),trail.y((n-1)*N+j+1,k),trail.z((n-1)*N+j+1,k)] ,[trail.x((n-1)*N+j+1,k+1),trail.y((n-1)*N+j+1,k+1),trail.z((n-1)*N+j+1,k+1)], local_cp);
-            induced_vel = induced_vel+temp;
-        end
-        
-        % write into influence matrix - for unit gamma
-        Influence_u(i,(n-1)*N+j) = induced_vel(1);
-        Influence_v(i,(n-1)*N+j) = induced_vel(2);
-        Influence_w(i,(n-1)*N+j) = induced_vel(3);
-    end
     end
 end
  
@@ -81,8 +76,10 @@ end
 [a, aline, r_R, Fnorm, Ftan, Gamma] = solveGamma(Uinf, N, Radius, cp, Influence_u, Influence_v, Influence_w, Omega, polar_alpha, polar_cl, polar_cd, chord_distribution);
 
 %% Post processing
+% [r_R, theta, b] = RadialSpacing(N, TipLocation_R, RootLocation_R);
 temp = RootLocation_R + flip(b*(cos(theta)+1));  
 dr = temp(2:end)-temp(1:end-1); % lengths of sections
+dr = repmat(dr,1,3);
 
 CT_sections = Fnorm*NBlades.*dr/(0.5*Uinf^2*pi*Radius^2); % local thrust coefficient
 CQ_sections = Ftan.*r_R*NBlades.*dr*Radius/(0.5*Uinf^3*pi*Radius^2);    % local torque coefficient

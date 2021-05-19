@@ -30,11 +30,8 @@ a_wake = 0.2602;   % ,should be average induction at the rotor, from BEM
 Uwake = Uinf*(1-a_wake);
 
 Omega = Uinf*TSR/Radius;
-Lw_D = 0.2;    % wake length in diameters downstream
+Lw_D = 0.5;    % wake length in diameters downstream
 
-% theta_array = [0:2*pi/NBlades:2*pi*(1-1/NBlades)]; % azimuthal positions of blades, assuming the first one is at 0
-% theta_array = linspace(0,2*pi,NBlades+1);
-% theta_array = theta_array(1:3);
 [cp, bound, trail]=vortex_system(Omega, NBlades, N, r_R, Radius, twist_distribution, chord_distribution, Lw_D, Uwake);
 
 %% determine induced velocity per unit strength of circulation (for Gamma=1)
@@ -52,7 +49,6 @@ for i=1:length(cp.x) % take all control points
             % first trailing vortex
             temp = induced_v_from_vortex(1,[trail.x((n-1)*N+j,1),trail.y((n-1)*N+j,1),trail.z((n-1)*N+j,1)] ,point1, local_cp);
             induced_vel = induced_vel+temp;
-
 
             temp = induced_v_from_vortex(1, point2, [trail.x((n-1)*N+j+1,1),trail.y((n-1)*N+j+1,1),trail.z((n-1)*N+j+1,1)], local_cp);
             induced_vel = induced_vel+temp;  

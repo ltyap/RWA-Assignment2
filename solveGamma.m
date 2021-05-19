@@ -3,7 +3,7 @@ function [a, aline, r_R, Fnorm, Ftan, Gamma_temp] = solveGamma(Uinf, N, Radius, 
 GammaNew = ones(length(cp.x),1); % initial guess, defined in control points
 U_inf = [Uinf,0,0];
 
-Niterations = 100;
+Niterations = 1000;
 errorlimit = 0.0001;
 error = 1.0;
 
@@ -40,12 +40,11 @@ for i=1:Niterations
         
         %         Uaxial = Uinf+u;
         %         Utan = Omega*r+v;%dot([Uinf+u, v, w],[1,0,0]);
-                 Urot = cross([-Omega,0,0],local_cp);
-                 Urel = [Uinf+u+Urot(1), v+Urot(2), w+Urot(3)];
-        
-                 azimdir = cross([-1/r, 0, 0]  , local_cp); % rotational direction
-                 Utan = dot(azimdir, Urel); % azimuthal direction
-                 Uaxial =  dot([1, 0, 0] , Urel); % axial velocity
+         Urot = cross([-Omega,0,0],local_cp);
+         Urel = [Uinf+u+Urot(1), v+Urot(2), w+Urot(3)];
+         azimdir = cross([1/r, 0, 0]  , local_cp); % rotational direction
+         Utan = dot(azimdir, Urel); % azimuthal direction
+         Uaxial =  dot([1, 0, 0] , Urel); % axial velocity
 %         Uaxial = Uinf+u;
 %         Utan = Omega*r + dot([Uinf+u, v, w],azimdir);
         
