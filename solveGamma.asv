@@ -22,7 +22,7 @@ for i=1:Niterations
         if mod(icp, N)~=0
             local_c = (chord_distribution(mod(icp, N))+chord_distribution(mod(icp, N)+1))/2; % local chord
         else % last segment
-            local_c = (chord_distribution(N)+chord_distribution(N+1))/2; % local chord
+            local_c = (chord_distribution(N)+chord_distribution(N+))/2; % local chord
         end
         
         u=0; % initialize velocity at control point

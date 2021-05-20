@@ -1,6 +1,3 @@
-%% TO DO
-% add control points from all blades, not just one
-
 % Assignment 2 of RWA - lifting line model
 clc
 clear all
@@ -86,12 +83,12 @@ CQ_sections = Ftan.*r_R*NBlades.*dr*Radius/(0.5*Uinf^3*pi*Radius^2);    % local 
 CP_sections = Ftan.*r_R*NBlades.*dr*Radius*Omega/(0.5*Uinf^3*pi*Radius^2); % local power coefficient  P=omega*Q
 Gamma = Gamma/(pi*Uinf^2/(NBlades*Omega)); % non-dimensionalize circulation
 
-CT = sum(dr.*Fnorm*NBlades/(0.5*Uinf^2*pi*Radius^2));     % total thrust coefficient
-CP = sum(dr'.*Ftan.*r_R*NBlades*Radius*Omega/(0.5*Uinf^3*pi*Radius^2));    % total power coefficient
+CT = sum(dr(1:N).*Fnorm(1:N)*NBlades/(0.5*Uinf^2*pi*Radius^2));     % total thrust coefficient
+CP = sum(dr(1:N)'.*Ftan(1:N).*r_R(1:N)*NBlades*Radius*Omega/(0.5*Uinf^3*pi*Radius^2));    % total power coefficient
 
-CT_all = sum(CT_sections, 'all');  % write to array of thrust coefficients
-CQ_all = sum(CQ_sections, 'all');  % write to array of torque coefficients
-CP_all = sum(CP_sections, 'all');  % write to array of power coefficients
+CT_all = sum(CT_sections(1:N), 'all');  % write to array of thrust coefficients
+CQ_all = sum(CQ_sections(1:N), 'all');  % write to array of torque coefficients
+CP_all = sum(CP_sections(1:N), 'all');  % write to array of power coefficients
 
 % %%%%%% SHOULD BE %%%%%%%%%
 % % CT = 0.6553;
