@@ -18,13 +18,11 @@ for i=1:Niterations
         local_cp = [cp.x(icp), cp.y(icp), cp.z(icp)];
         % determine radial position of the controlpoint;
         r = sqrt(dot(local_cp, local_cp));
-        % QUICK FIX - rewrite!
-        if icp<=N
-            local_c = (chord_distribution(icp)+chord_distribution(icp+1))/2; % local chord
-        elseif icp<=2*N
-            local_c = (chord_distribution(icp-N)+chord_distribution(icp+1-N))/2; % local chord
-        else
-            local_c = (chord_distribution(icp-2*N)+chord_distribution(icp+1-2*N))/2; % local chord
+
+        if mod(icp, N)~=0
+            local_c = (chord_distribution(mod(icp, N))+chord_distribution(mod(icp, N)+1))/2; % local chord
+        else % last segment
+            local_c = (chord_distribution(N)+chord_distribution(N+1))/2; % local chord
         end
         
         u=0; % initialize velocity at control point
@@ -42,7 +40,7 @@ for i=1:Niterations
         %         Utan = Omega*r+v;%dot([Uinf+u, v, w],[1,0,0]);
          Urot = cross([-Omega,0,0],local_cp);
          Urel = [Uinf+u+Urot(1), v+Urot(2), w+Urot(3)];
-         azimdir = cross([-1/r, 0, 0]  , local_cp); % rotational direction
+         azimdir = cross([1/r, 0, 0]  , local_cp); % rotational direction
          Utan = dot(azimdir, Urel); % azimuthal direction
          Uaxial =  dot([1, 0, 0] , Urel); % axial velocity
 %         Uaxial = Uinf+u;
