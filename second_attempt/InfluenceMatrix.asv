@@ -1,14 +1,10 @@
-function [UMat, VMat, WMat] = InfluenceMatrix(RotorWakeSystem, NBlades)
+function [] = InfluenceMatrix(RotorWakeSystem, Uinf, Radius, NBlades)
     controlpoints = RotorWakeSystem.cp;
     bound = RotorWakeSystem.bound;
     trail = RotorWakeSystem.trail;
     Npan = RotorWakeSystem.NpanelsPerBlade;
     Gamma = 1;  
     Ncp = length(controlpoints.x);   
-    
-    UMat = zeros(Ncp,Npan);
-    VMat = zeros(Ncp,Npan);
-    WMat = zeros(Ncp,Npan);
     
     idx = [1:Npan+1];
     for icp = 1:Ncp
@@ -35,9 +31,9 @@ function [UMat, VMat, WMat] = InfluenceMatrix(RotorWakeSystem, NBlades)
                trail_j.point2.z = trail_blades.z(:,jring+1);              
                
                InducedVelocity = velocity_single_horseshoe(localcp, bound_j, trail_j, Gamma);
-               UMat(icp,jring+(iBlade-1)*Npan) = InducedVelocity(1);
-               VMat(icp,jring+(iBlade-1)*Npan) = InducedVelocity(2);
-               WMat(icp,jring+(iBlade-1)*Npan) = InducedVelocity(3);
+%                UMat(icp,jring) = InducedVelocity(1);
+%                VMat(icp,jring) = InducedVelocity(2);
+%                WMat(icp,jring) = InducedVelocity(3);
            end
        end
     end

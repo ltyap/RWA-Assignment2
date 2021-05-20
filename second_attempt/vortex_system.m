@@ -52,6 +52,7 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
     trail.y = reshape(trail.y,length(theta_array),NBlades*length(r_R));
     trail.z = reshape(trail.z,length(theta_array),NBlades*length(r_R));
 
+       
     % plot system - for checking
     hold on
     scatter3(cp.x, cp.y, cp.z, 10, 'filled', 'r')
@@ -68,7 +69,12 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
     ylabel("y")
     zlabel("z")
     
+    trail.x = [bound.x;trail.x];
+    trail.y = [bound.y;trail.y];
+    trail.z = [bound.z;trail.z];
+    
     results.cp = cp;
     results.bound = bound;
     results.trail = trail;
+    results.NpanelsPerBlade = N;
 end

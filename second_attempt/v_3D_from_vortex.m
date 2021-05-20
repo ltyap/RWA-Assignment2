@@ -1,5 +1,5 @@
 % 3D velocity induced by a vortex filament
-function u_ind = induced_v_from_vortex(gamma, point1, point2, cp)
+function u_ind = v_3D_from_vortex(gamma, point1, point2, cp)
 % function to calculate the velocity induced by a straight 3D vortex filament
 % with circulation GAMMA at a point VP1. The geometry of the vortex filament
 % is defined by its edges: the filament starts at [X1, Y1, Z1] and ends at [X2, Y2, Z2].

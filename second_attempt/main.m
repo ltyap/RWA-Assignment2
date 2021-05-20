@@ -29,6 +29,6 @@ Nrotations = 1;%for the wake
 theta_array = linspace(0,Nrotations*2*pi);%Omega*t, where t is the time
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades);
 
-InfluenceMatrix();
+[UMatrix, VMatrix, WMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades);
 
 
