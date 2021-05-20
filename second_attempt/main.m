@@ -26,5 +26,9 @@ a_wake = 0.2602;   % ,should be average induction at the rotor, from BEM
 % Uwake = Uinf(1)*(1-a_wake);
 Omega = Uinf(1)*TSR/Radius;
 Nrotations = 1;%for the wake
-theta_array = linspace(0,Nrotations*2*pi,50);%Omega*t, where t is the time
-vortex_system(r_R, Radius, TSR/(1-a_wake), Uinf, theta_array, NBlades);
+theta_array = linspace(0,Nrotations*2*pi);%Omega*t, where t is the time
+RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades);
+
+InfluenceMatrix();
+
+

@@ -1,4 +1,4 @@
-function []=vortex_system(r_R, Radius, tipspeedratio, Uinf, theta_array, NBlades)
+function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlades)
     [chord_distribution, twist_distribution] = BladeGeometry(r_R);
     N = length(r_R)-1;
     trail.x = [];
@@ -27,13 +27,13 @@ function []=vortex_system(r_R, Radius, tipspeedratio, Uinf, theta_array, NBlades
             beta = -deg2rad(twist_distribution(i));
 
             % 1st trailing vortex, not sure about this
-            temp.x(i) = bound.x((n-1)*(N+1)+i)+0.75*c*cos(beta);%(n-1)*(N+1)+
-            temp.y(i) = bound.y((n-1)*(N+1)+i)-0.75*c*sin(beta)*sin(blade_azim);
-            temp.z(i) = bound.z((n-1)*(N+1)+i)+0.75*c*sin(beta)*cos(blade_azim);
+            temp1.x(i) = bound.x((n-1)*(N+1)+i)+0.75*c*cos(beta);%(n-1)*(N+1)+
+            temp1.y(i) = bound.y((n-1)*(N+1)+i)-0.75*c*sin(beta)*sin(blade_azim);
+            temp1.z(i) = bound.z((n-1)*(N+1)+i)+0.75*c*sin(beta)*cos(blade_azim);
                         
-            trail.x = [trail.x,temp.x(i)];
-            trail.y = [trail.y,temp.y(i)];
-            trail.z = [trail.z,temp.z(i)]; 
+            trail.x = [trail.x,temp1.x(i)];
+            trail.y = [trail.y,temp1.y(i)];
+            trail.z = [trail.z,temp1.z(i)]; 
             for j = 1:length(theta_array)-1
                 dx = (theta_array(j+1)-theta_array(j))/tipspeedratio*Radius;
                 dy = r_R(i)*Radius*(cos(-theta_array(j+1)+blade_azim)-cos(-theta_array(j)+blade_azim));%
@@ -66,4 +66,8 @@ function []=vortex_system(r_R, Radius, tipspeedratio, Uinf, theta_array, NBlades
     xlabel("x")
     ylabel("y")
     zlabel("z")
+    
+    results.cp = cp;
+    results.bound = bound;
+    results.trail = trail;
 end
