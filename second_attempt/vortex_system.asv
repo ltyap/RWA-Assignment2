@@ -36,8 +36,8 @@ function []=vortex_system(r_R, Radius, tipspeedratio, Uinf, theta_array, NBlades
             trail.z = [trail.z,temp.z(i)]; 
             for j = 1:length(theta_array)-1
                 dx = (theta_array(j+1)-theta_array(j))/tipspeedratio*Radius;
-                dy = r_R(i)*Radius*(cos(-theta_array(j+1)+blade_azim)-cos(-theta_array(j)+blade_azim));%
-                dz = r_R(i)*Radius*(sin(-theta_array(j+1)+blade_azim)-sin(-theta_array(j)+blade_azim));% 
+                dy = r_R(i)*Radius*(cos(theta_array(j+1)+bl)-cos(theta_array(j)));%
+                dz = r_R(i)*Radius*(sin(theta_array(j+1))-sin(theta_array(j)));% 
                 temp1.x = trail.x(end)+dx;
                 temp1.y = trail.y(end)+dy;
                 temp1.z = trail.z(end)+dz;
@@ -62,6 +62,7 @@ function []=vortex_system(r_R, Radius, tipspeedratio, Uinf, theta_array, NBlades
             plot3(trail.x(:,(n-1)*(N+1)+i), trail.y(:,(n-1)*(N+1)+i), trail.z(:,(n-1)*(N+1)+i), '-r')
         end
     end
+%     ylim([-100:10:100]);
     hold off
     xlabel("x")
     ylabel("y")
