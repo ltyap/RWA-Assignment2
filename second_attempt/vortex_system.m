@@ -11,13 +11,14 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         % determine control point locations - at middle of segments
         r_cp = (r_R(1:end-1)+r_R(2:end))/2*Radius;%[m]
         chord_cp = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;
-        [~,cp.twist((n-1)*N+1:n*N)] = BladeGeometry(r_cp); % twist at control points [deg]
-        cp.x((n-1)*N+1:n*N) = zeros(N,1)+(0.5*chord_cp'); % x-coordinate
+        [~,temp] = BladeGeometry(r_cp/Radius); % twist at control points [deg]
+        cp.twist((n-1)*N+1:n*N) = temp;
+        cp.x((n-1)*N+1:n*N) = zeros(N,1)+(0.75*chord_cp'); % x-coordinate
         cp.y((n-1)*N+1:n*N) = r_cp*cos(blade_azim);     % y-coordinate
-        cp.z((n-1)*N+1:n*N) = r_cp*sin(blade_azim);     % z-coordinate
+        cp.z((n-1)*N+1:n*N) = r_cp.*cosd(temp)*sin(blade_azim);     % z-coordinate
 
         % bound vortices
-        bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1); % x-coordinate
+        bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1)+0.25*chord_distribution'; % x-coordinate
         bound.y((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*cos(blade_azim);     % y-coordinate
         bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(blade_azim);     % z-coordinate
         %determine trailing vortices
