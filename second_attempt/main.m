@@ -2,14 +2,11 @@
 clc
 clear all
 close all
-
-% [polar_alpha, polar_cl, polar_cd]=import_polars();
 %% define the blade geometry - same as in BEM model
 % blade discretisation
 TipLocation_R =  1;%non-dimensional]
 RootLocation_R =  0.2;%[non-dimensional]
 N = 20; % number of segments
-
 
 % spacing: 1 for uniform, 0 for cosine
 spacing = 1;
@@ -19,18 +16,18 @@ r_R = dist.r_R;
 windvel = [10,0,0];      % freestream velocity [m/s]
 altitude = 0;%[km]
 [~, ~, pinf, rho] = atmosisa(altitude);
-
-% rotor parameters
+%% rotor parameters
 TSR = 8;        % tip speed ratios we want to calculate
 Radius = 50;    % blade radius(length) [m]
 NBlades = 3;    % number of blades
 a_wake = 0.2602;   % ,should be average induction at the rotor, from BEM
-% Uwake = Uinf(1)*(1-a_wake);
 Omega = windvel(1)*TSR/Radius;
 Nrotations = 15;%for the wake
 % theta_array = linspace(0,Nrotations*2*pi);%Omega*t, where t is the time
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
-
+% Lw_D:  wake length in diameters downstream
+Lw_D = max(theta_array)/Omega*windvel(1)*(1-a_wake)/(2*Radius);% [-]
+%% Main 
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades);
 
 [InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades);
