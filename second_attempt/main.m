@@ -6,7 +6,7 @@ close all
 % blade discretisation
 TipLocation_R =  1;%non-dimensional]
 RootLocation_R =  0.2;%[non-dimensional]
-N = 20; % number of segments
+N = 8; % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
 spacing = 1;
@@ -22,7 +22,7 @@ Radius = 50;    % blade radius(length) [m]
 NBlades = 3;    % number of blades
 a_wake = 0.2602;   % ,should be average induction at the rotor, from BEM
 Omega = windvel(1)*TSR/Radius;
-Nrotations = 15;%for the wake
+Nrotations = 0.5;%for the wake
 % theta_array = linspace(0,Nrotations*2*pi);%Omega*t, where t is the time
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream

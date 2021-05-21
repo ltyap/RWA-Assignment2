@@ -11,11 +11,7 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         % determine control point locations for no-normal flow condition - at middle of segments
         r_cp = (r_R(1:end-1)+r_R(2:end))/2*Radius;%[m]        
         [~,twist] = BladeGeometry(r_cp/Radius); % twist at control points [deg]
-%         temp(:,1) = 0.5*chord_cp';
-%         temp(:,2) = r_cp;
-%         temp(:,3) = 0;
         twist = deg2rad(twist);
-%         cp.twist((n-1)*N+1:n*N) = deg2rad(cp.twist((n-1)*N+1:n*N));
         cp.coordinates(1,(n-1)*N+1:n*N) = 0.5*chord_cp';% x-coordinate
         cp.coordinates(2,(n-1)*N+1:n*N) = r_cp.*cos(blade_azim);%-temp(3).*sin(blade_azim);% y-coordinate
         cp.coordinates(3,(n-1)*N+1:n*N) = r_cp.*sin(blade_azim);%+temp(3).*cos(blade_azim);% z-coordinate
@@ -71,8 +67,6 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
     trail.x = reshape(trail.x,length(theta_array),NBlades*length(r_R));
     trail.y = reshape(trail.y,length(theta_array),NBlades*length(r_R));
     trail.z = reshape(trail.z,length(theta_array),NBlades*length(r_R));
-
-       
     % plot system - for checking
     hold on
     scatter3(cp.coordinates(1,:), cp.coordinates(2,:), cp.coordinates(3,:), 10, 'filled', 'r')
@@ -82,15 +76,14 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         for i=1:N+1
             plot3([trail.x(1,(n-1)*(N+1)+i), bound.x((n-1)*(N+1)+i)], ...
                 [trail.y(1,(n-1)*(N+1)+i), bound.y((n-1)*(N+1)+i)], [trail.z(1,(n-1)*(N+1)+i), bound.z((n-1)*(N+1)+i)], '--bo')
-            plot3(trail.x(:,(n-1)*(N+1)+i), trail.y(:,(n-1)*(N+1)+i), trail.z(:,(n-1)*(N+1)+i), '-r')
+            plot3(trail.x(:,(n-1)*(N+1)+i), trail.y(:,(n-1)*(N+1)+i), trail.z(:,(n-1)*(N+1)+i), '--r')
         end
     end
-    hold off
+    %     hold off
     xlabel("x")
     ylabel("y")
     zlabel("z")   
-    
-   
+  
     trail.x = [bound.x;trail.x];
     trail.y = [bound.y;trail.y];
     trail.z = [bound.z;trail.z];
@@ -115,6 +108,57 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         ring.y = [ring.y, temp2.y];
         ring.z = [ring.z, temp2.z];
     end
+    
+    %2nd rotor
+    SeparationDist = 2*(2*Radius);
+    phase = deg2rad(80);
+    cosphase = cos(phase);
+    sinephase = sin(phase);
+       
+    transformed(1,:) = cp.coordinates(1,:);
+    transformed(2,:) = (cp.coordinates(2,:))*cosphase - cp.coordinates(3,:)*sinephase +SeparationDist;
+    transformed(3,:) = (cp.coordinates(2,:))*sinephase + cp.coordinates(3,:)*cosphase;
+    scatter3(transformed(1,:), transformed(2,:), transformed(3,:), 10, 'filled', 'r')   
+    cp.coordinates = [cp.coordinates, transformed];
+    
+    clear transformed
+    transformed(1,:) = bound.centrepoint(1,:);
+    transformed(2,:) = (bound.centrepoint(2,:))*cosphase - bound.centrepoint(3,:)*sinephase +SeparationDist;
+    transformed(3,:) = (bound.centrepoint(2,:))*sinephase + bound.centrepoint(3,:)*cosphase;
+    scatter3(transformed(1,:),transformed(2,:), transformed(3,:),'r*');
+    bound.centrepoint = [bound.centrepoint, transformed];
+    
+    
+%     for n=1:NBlades
+%         plot3(bound.x((n-1)*(N+1)+1:n*(N+1)),...
+%             (bound.y((n-1)*(N+1)+1:n*(N+1)))*cosphase - bound.z((n-1)*(N+1)+1:n*(N+1))*sinephase +SeparationDist,...
+%             (bound.y((n-1)*(N+1)+1:n*(N+1)))*sinephase + bound.z((n-1)*(N+1)+1:n*(N+1))*cosphase,'-k+')
+%         for i=1:N+1
+%             plot3([trail.x(1,(n-1)*(N+1)+i), bound.x((n-1)*(N+1)+i)], ...
+%                 [trail.y(1,(n-1)*(N+1)+i), bound.y((n-1)*(N+1)+i)]*cosphase - [trail.z(1,(n-1)*(N+1)+i), bound.z((n-1)*(N+1)+i)]*sinephase + SeparationDist,...
+%                 [trail.y(1,(n-1)*(N+1)+i), bound.y((n-1)*(N+1)+i)]*sinephase + [trail.z(1,(n-1)*(N+1)+i), bound.z((n-1)*(N+1)+i)]*cosphase,'--bo')
+%             plot3(trail.x(:,(n-1)*(N+1)+i),...
+%                 (trail.y(:,(n-1)*(N+1)+i))*cosphase - trail.z(:,(n-1)*(N+1)+i)*sinephase + SeparationDist,...
+%                 (trail.y(:,(n-1)*(N+1)+i))*sinephase + trail.z(:,(n-1)*(N+1)+i)*cosphase, '-r')%- SeparationDist*sinephase
+%         end
+%     end
+    clear transformed
+    transformed(:,:,1) = ring.x;
+    transformed(:,:,2) = ring.y*cosphase - ring.z*sinephase + SeparationDist;
+    transformed(:,:,3) = ring.y*sinephase + ring.z*cosphase;   
+    
+    for n=1:NBlades
+        for i=1:N
+            plot3(transformed(:,(n-1)*N+i,1),...
+                transformed(:,(n-1)*N+i,2),...
+                transformed(:,(n-1)*N+i,3), 'b');
+        end
+    end    
+    ring.x = [ring.x, transformed(:,:,1)];
+    ring.y = [ring.y, transformed(:,:,2)];
+    ring.z = [ring.z, transformed(:,:,3)];
+    
+    
     
     cp.Totalcp = N*NBlades;
     results.ring = ring;
