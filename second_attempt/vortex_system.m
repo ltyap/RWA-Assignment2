@@ -1,5 +1,6 @@
 function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlades)
     [chord_distribution, twist_distribution] = BladeGeometry(r_R);
+    chord_cp = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;
     N = length(r_R)-1;%number of panels/control points/bound vortices
     trail.x = [];
     trail.y = [];
@@ -8,15 +9,25 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         blade_azim = 2*pi/NBlades*(n-1);
 
         % determine control point locations for no-normal flow condition - at middle of segments
-        r_cp = (r_R(1:end-1)+r_R(2:end))/2*Radius;%[m]
-        chord_cp = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;
-        [~,temp] = BladeGeometry(r_cp/Radius); % twist at control points [deg]
-        cp.twist((n-1)*N+1:n*N) = temp;
-        cp.coordinates(1,(n-1)*N+1:n*N) = zeros(N,1)+0.5*chord_cp';% x-coordinate
-        cp.coordinates(2,(n-1)*N+1:n*N) = r_cp*cos(blade_azim);% y-coordinate
-        cp.coordinates(3,(n-1)*N+1:n*N) = r_cp*sin(blade_azim);% z-coordinate
+        r_cp = (r_R(1:end-1)+r_R(2:end))/2*Radius;%[m]        
+        [~,twist] = BladeGeometry(r_cp/Radius); % twist at control points [deg]
+%         temp(:,1) = 0.5*chord_cp';
+%         temp(:,2) = r_cp;
+%         temp(:,3) = 0;
+        twist = deg2rad(twist);
+%         cp.twist((n-1)*N+1:n*N) = deg2rad(cp.twist((n-1)*N+1:n*N));
+        cp.coordinates(1,(n-1)*N+1:n*N) = 0.5*chord_cp';% x-coordinate
+        cp.coordinates(2,(n-1)*N+1:n*N) = r_cp.*cos(blade_azim);%-temp(3).*sin(blade_azim);% y-coordinate
+        cp.coordinates(3,(n-1)*N+1:n*N) = r_cp.*sin(blade_azim);%+temp(3).*cos(blade_azim);% z-coordinate
         cp.radius((n-1)*N+1:n*N) = r_cp;
         cp.chord((n-1)*N+1:n*N) = chord_cp;
+        
+        cp.normal(:,(n-1)*N+1:n*N) = [cos(twist);...
+                        0*cos(blade_azim) - -sin(twist)*sin(blade_azim);...
+                        0*sin(blade_azim) + -sin(twist)*cos(blade_azim)];
+        cp.tangential(:,(n-1)*N+1:n*N) = [-sin(twist); ...
+                        0*cos(blade_azim) - -cos(twist)*sin(blade_azim);...
+                        0*sin(blade_azim) + -cos(twist)*cos(blade_azim)];
         
         % bound vortices
         bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1); % x-coordinate
