@@ -2,7 +2,6 @@ function plotting_func(windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,c
 colors = ['r'; 'b'; 'g'; 'm'; 'y']; % define color scheme, more colors need to be added for larger analysis
 inflow = rad2deg(inflow); % change inflow angle from rad to degrees
 Gamma_temp = Gamma_temp/(pi*norm(windvel)^2/(NBlades*Omega));
-
 %% a and a'
 figure()
 hold on

@@ -6,12 +6,15 @@ close all
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 20;  % number of segments
+N = 15;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
-spacing = 1;
-[dist] = RadialSpacing(N, TipLocation_R, RootLocation_R, spacing);
-r_R = dist.r_R;
+spacing = 0;
+[r_R] = RadialSpacing(N, TipLocation_R, RootLocation_R, spacing);
+% it can't converge with current definition of error bound using cosine
+% spacing. Might have to try relaxing error or mess with other
+% parameters. The results seem to be alright though, just not fine at the
+% root
 %% flow conditions - same as in BEM model
 windvel = [10,0,0];      % freestream velocity [m/s]
 altitude = 0;%[km]
@@ -41,5 +44,10 @@ RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlade
 % % CT = 0.6553;
 % % CQ = 0.2801;
 % % CP = 0.4482;
+
+load('tsr6.mat');
+load('tsr8.mat');
+load('tsr10.mat');
+
 
 plotting_func(windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
