@@ -32,15 +32,16 @@ function [InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades)
     
     InfluenceMatrix.U = UMat;
     InfluenceMatrix.V = VMat;
-    InfluenceMatrix.W = WMat;   
-    figure;
-    imagesc(UMat);
-    colorbar();
-    title('U matrix');
-    figure;
-    imagesc(VMat);
-    title('Vmatrix');
-    figure;
-    imagesc(WMat);
-    title('W Matrix');     
+    InfluenceMatrix.W = WMat;
+%% Plotting influence matrices - for checking
+%     figure;
+%     imagesc(UMat);
+%     colorbar();
+%     title('U matrix');
+%     figure;
+%     imagesc(VMat);
+%     title('Vmatrix');
+%     figure;
+%     imagesc(WMat);
+%     title('W Matrix');     
 end

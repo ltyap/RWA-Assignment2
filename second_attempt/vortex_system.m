@@ -1,7 +1,7 @@
 function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlades)
     [chord_distribution, twist_distribution] = BladeGeometry(r_R);
     chord_cp = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;
-    N = length(r_R)-1;%number of panels/control points/bound vortices
+    N = length(r_R)-1;  % number of panels/control points/bound vortices
     trail.x = [];
     trail.y = [];
     trail.z = [];
@@ -12,9 +12,9 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         r_cp = (r_R(1:end-1)+r_R(2:end))/2*Radius;%[m]        
         [~,twist] = BladeGeometry(r_cp/Radius); % twist at control points [deg]
         twist = deg2rad(twist);
-        cp.coordinates(1,(n-1)*N+1:n*N) = 0.5*chord_cp';% x-coordinate
-        cp.coordinates(2,(n-1)*N+1:n*N) = r_cp.*cos(blade_azim);%-temp(3).*sin(blade_azim);% y-coordinate
-        cp.coordinates(3,(n-1)*N+1:n*N) = r_cp.*sin(blade_azim);%+temp(3).*cos(blade_azim);% z-coordinate
+        cp.coordinates(1,(n-1)*N+1:n*N) = 0.5*chord_cp';    % x-coordinate
+        cp.coordinates(2,(n-1)*N+1:n*N) = r_cp.*cos(blade_azim);    % y-coordinate
+        cp.coordinates(3,(n-1)*N+1:n*N) = r_cp.*sin(blade_azim);    % z-coordinate
         cp.radius((n-1)*N+1:n*N) = r_cp;
         cp.chord((n-1)*N+1:n*N) = chord_cp;
         
@@ -27,8 +27,8 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         
         % bound vortices
         bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1); % x-coordinate
-        bound.y((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*cos(blade_azim);% y-coordinate
-        bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(blade_azim);% z-coordinate
+        bound.y((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*cos(blade_azim);    % y-coordinate
+        bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(blade_azim);    % z-coordinate
         
         bound.centrepoint(1,(n-1)*N+1:n*N) = zeros(N,1);
         bound.centrepoint(2,(n-1)*N+1:n*N) = r_cp*cos(blade_azim);
@@ -37,20 +37,21 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         bound.radialcentrepoint((n-1)*N+1:n*N) = sqrt(dot(bound.centrepoint(:,(n-1)*N+1:n*N),...
             bound.centrepoint(:,(n-1)*N+1:n*N)));
         
-        %determine trailing vortices
+        % trailing vortices
         for i=1:N+1 % loop over bound vortices
             r = r_R(i);
             c = chord_distribution(i);
             beta = -deg2rad(twist_distribution(i));
 
-            % 1st trailing vortex, not sure about this
+            % 1st trailing vortex
             temp1.x(i) = bound.x((n-1)*(N+1)+i)+1*c*cos(beta);
             temp1.y(i) = bound.y((n-1)*(N+1)+i)-1*c*sin(beta)*sin(blade_azim);
             temp1.z(i) = bound.z((n-1)*(N+1)+i)+1*c*sin(beta)*cos(blade_azim);
                         
             trail.x = [trail.x,temp1.x(i)];
             trail.y = [trail.y,temp1.y(i)];
-            trail.z = [trail.z,temp1.z(i)]; 
+            trail.z = [trail.z,temp1.z(i)];
+            
             for j = 1:length(theta_array)-1
                 dx = (theta_array(j+1)-theta_array(j))/tipspeedratio*Radius;
                 dy = r_R(i)*Radius*(cos(-theta_array(j+1)+blade_azim)-cos(-theta_array(j)+blade_azim));%
@@ -64,9 +65,12 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
             end            
         end
     end
+    
     trail.x = reshape(trail.x,length(theta_array),NBlades*length(r_R));
     trail.y = reshape(trail.y,length(theta_array),NBlades*length(r_R));
     trail.z = reshape(trail.z,length(theta_array),NBlades*length(r_R));
+    
+    
     % plot system - for checking
     hold on
     scatter3(cp.coordinates(1,:), cp.coordinates(2,:), cp.coordinates(3,:), 10, 'filled', 'r')
@@ -109,7 +113,7 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
         ring.z = [ring.z, temp2.z];
     end
     
-    %2nd rotor
+    % 2nd rotor
     SeparationDist = 2*(2*Radius);
     phase = deg2rad(80);
     cosphase = cos(phase);
@@ -129,19 +133,6 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
     bound.centrepoint = [bound.centrepoint, transformed];
     
     
-%     for n=1:NBlades
-%         plot3(bound.x((n-1)*(N+1)+1:n*(N+1)),...
-%             (bound.y((n-1)*(N+1)+1:n*(N+1)))*cosphase - bound.z((n-1)*(N+1)+1:n*(N+1))*sinephase +SeparationDist,...
-%             (bound.y((n-1)*(N+1)+1:n*(N+1)))*sinephase + bound.z((n-1)*(N+1)+1:n*(N+1))*cosphase,'-k+')
-%         for i=1:N+1
-%             plot3([trail.x(1,(n-1)*(N+1)+i), bound.x((n-1)*(N+1)+i)], ...
-%                 [trail.y(1,(n-1)*(N+1)+i), bound.y((n-1)*(N+1)+i)]*cosphase - [trail.z(1,(n-1)*(N+1)+i), bound.z((n-1)*(N+1)+i)]*sinephase + SeparationDist,...
-%                 [trail.y(1,(n-1)*(N+1)+i), bound.y((n-1)*(N+1)+i)]*sinephase + [trail.z(1,(n-1)*(N+1)+i), bound.z((n-1)*(N+1)+i)]*cosphase,'--bo')
-%             plot3(trail.x(:,(n-1)*(N+1)+i),...
-%                 (trail.y(:,(n-1)*(N+1)+i))*cosphase - trail.z(:,(n-1)*(N+1)+i)*sinephase + SeparationDist,...
-%                 (trail.y(:,(n-1)*(N+1)+i))*sinephase + trail.z(:,(n-1)*(N+1)+i)*cosphase, '-r')%- SeparationDist*sinephase
-%         end
-%     end
     clear transformed
     transformed(:,:,1) = ring.x;
     transformed(:,:,2) = ring.y*cosphase - ring.z*sinephase + SeparationDist;
@@ -157,7 +148,6 @@ function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlade
     ring.x = [ring.x, transformed(:,:,1)];
     ring.y = [ring.y, transformed(:,:,2)];
     ring.z = [ring.z, transformed(:,:,3)];
-    
     
     
     cp.Totalcp = N*NBlades;
