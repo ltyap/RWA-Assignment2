@@ -28,14 +28,19 @@ theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 
+%% second rotor
+sec_rot = 0 ; % is there a second rotor
+
 %% LLT calculations
-RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades);
+RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot);
 
 [InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades);
-[a, aline, r_R_cp, Fnorm, Ftan, Gamma_temp]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
-[CT, CP, CQ] = CT_CPcalculations(Fnorm, Ftan, windvel(1), r_R, r_R_cp, Omega, Radius, NBlades);
+[a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
+[CT, CP, CQ, ct, cp, cq] = CT_CPcalculations(Fnorm, Ftan, windvel(1), r_R, r_R_cp, Omega, Radius, NBlades);
 
 % %%%%%% FROM BEM %%%%%%%%%
 % % CT = 0.6553;
 % % CQ = 0.2801;
 % % CP = 0.4482;
+
+plotting_func(windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);

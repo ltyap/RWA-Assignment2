@@ -1,4 +1,4 @@
-function [a, aline, r_R, Fnorm, Ftan, GammaNew] = solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, wind)
+function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, wind)
     
     UMat = InfluenceMatrix.U;
     VMat = InfluenceMatrix.V;
@@ -46,7 +46,7 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew] = solveSystem(InfluenceMatrix, R
             Utan = dot(azimdir, Urel); % azimuthal direction
             Uaxial =  dot([1, 0, 0] , Urel); % axial velocity
 
-            [fnorm , ftan, gamma, ~, ~] = loadBladeElement(Utan, Uaxial, radialpos/Radius);
+            [fnorm , ftan, gamma, alpha, inflow] = loadBladeElement(Utan, Uaxial, radialpos/Radius);
 
             % new point of new estimate of circulation for the blade section
             GammaNew(icp) = gamma;
@@ -57,6 +57,8 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew] = solveSystem(InfluenceMatrix, R
             r_R(icp) = radialpos/Radius;    % location of control point
             Fnorm(icp) = fnorm ;
             Ftan(icp) = ftan ;
+            Alpha(icp) = alpha;
+            Inflow(icp) = inflow;
         end % end loop control points
 
         % check convergence of solution
