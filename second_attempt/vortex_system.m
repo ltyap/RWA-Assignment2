@@ -84,14 +84,14 @@ bladeAzim = bladeAzim(2:end-1);
 
 for krot = 1:length(bladeAzim)
     for i = 1:N
-        newcpcoord(:,i) = Rotate(bound.cpcoord(:,i),bladeAzim(krot));
+        newboundcpcoord(:,i) = Rotate(bound.cpcoord(:,i),bladeAzim(krot));
         newnormal(:,i) = Rotate(bound.normal(:,i),bladeAzim(krot));
         newtangential(:,i) = Rotate(bound.tangential(:,i),bladeAzim(krot));
     end
     bound.normal = [bound.normal, newnormal];
     bound.tangential = [bound.tangential, newtangential];
-    bound.cpcoord = [bound.cpcoord, newcpcoord];
-    scatter3(newcpcoord(1,:),newcpcoord(2,:),newcpcoord(3,:),'bo');
+    bound.cpcoord = [bound.cpcoord, newboundcpcoord];
+    scatter3(newboundcpcoord(1,:),newboundcpcoord(2,:),newboundcpcoord(3,:),'bo');
 end
 for krot = 1:length(bladeAzim)
     rotatedrings_x = ring.x;

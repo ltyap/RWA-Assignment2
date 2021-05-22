@@ -29,8 +29,7 @@ theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 
 %% second rotor
-sec_rot = 2 ; % is there a second rotor
-
+sec_rot = 0; % is there a second rotor
 %% LLT calculations
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot);
 
