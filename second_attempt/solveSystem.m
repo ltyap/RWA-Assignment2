@@ -8,10 +8,9 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(Inf
     Vinf = wind(2);
     Winf = wind(3);
     
-    NBlades = RotorWakeSystem.NBlades;
-%     cp = RotorWakeSystem.cp;%for solving using no-normal flow condition
+    NBlades = RotorWakeSystem.NBlades;% per rotor
     bound = RotorWakeSystem.bound;
-    Ncp = RotorWakeSystem.NpanelsPerBlade*NBlades;  % as many points as there are panels
+    Ncp = bound.Totalcp;  % as many points as there are panels
     Nrings = RotorWakeSystem.NpanelsPerBlade*NBlades;   % as many horseshoes as there are panels
     GammaNew = ones(Ncp,1); % initial guess, defined in control points
     a = zeros(Ncp,1);
@@ -27,9 +26,9 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(Inf
         
         % calculate velocity, circulation and loads at the controlpoints
         for icp= 1:Ncp  % loop over all control points
-            localcp = bound.centrepoint(:,icp);
+            localcp = bound.cpcoord(:,icp);
             % determine radial position of the controlpoint;
-            radialpos = bound.radialcentrepoint(icp);%[m]
+            radialpos = bound.cp_radialpos(icp);%[m]
             u=0; % initialize velocity at control point
             v=0;
             w=0;

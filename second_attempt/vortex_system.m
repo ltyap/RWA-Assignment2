@@ -1,136 +1,151 @@
 function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlades,sec_rot)
-[chord_distribution, twist_distribution] = BladeGeometry(r_R);
-chord_cp = (chord_distribution(1:end-1)+chord_distribution(2:end))/2;
+[c, twist_distribution] = BladeGeometry(r_R);
+twist = -deg2rad(twist_distribution);
+cp_chord = (c(1:end-1)+c(2:end))/2;
+r_R_cp = 0.5*(r_R(1:end-1) + r_R(2:end));
+
+[~,cp_twist] = BladeGeometry(r_R_cp);
+cp_twist = deg2rad(cp_twist);
+
+theta_array = theta_array(:);
 N = length(r_R)-1;  % number of panels/control points/bound vortices
-trail.x = [];
-trail.y = [];
-trail.z = [];
-for n=1:NBlades % loop over blades
-    blade_azim = 2*pi/NBlades*(n-1);
-    
-    % determine control point locations for no-normal flow condition - at middle of segments
-    r_cp = (r_R(1:end-1)+r_R(2:end))/2*Radius;%[m]
-    [~,twist] = BladeGeometry(r_cp/Radius); % twist at control points [deg]
-    twist = deg2rad(twist);
-    cp.coordinates(1,(n-1)*N+1:n*N) = zeros(N,1);%0.5*chord_cp';    % x-coordinate
-    cp.coordinates(2,(n-1)*N+1:n*N) = r_cp.*cos(blade_azim);    % y-coordinate
-    cp.coordinates(3,(n-1)*N+1:n*N) = r_cp.*sin(blade_azim);    % z-coordinate
-    cp.radius((n-1)*N+1:n*N) = r_cp;
-    cp.chord((n-1)*N+1:n*N) = chord_cp;
-    
-    cp.normal(:,(n-1)*N+1:n*N) = [cos(twist);...
-        0*cos(blade_azim) - -sin(twist)*sin(blade_azim);...
-        0*sin(blade_azim) + -sin(twist)*cos(blade_azim)];
-    cp.tangential(:,(n-1)*N+1:n*N) = [-sin(twist); ...
-        0*cos(blade_azim) - -cos(twist)*sin(blade_azim);...
-        0*sin(blade_azim) + -cos(twist)*cos(blade_azim)];
-    
-    % bound vortices
-    bound.x((n-1)*(N+1)+1:n*(N+1)) = zeros(N+1,1); % x-coordinate
-    bound.y((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*cos(blade_azim);    % y-coordinate
-    bound.z((n-1)*(N+1)+1:n*(N+1)) = r_R*Radius*sin(blade_azim);    % z-coordinate
-    
-    bound.centrepoint(1,(n-1)*N+1:n*N) = zeros(N,1);
-    bound.centrepoint(2,(n-1)*N+1:n*N) = r_cp*cos(blade_azim);
-    bound.centrepoint(3,(n-1)*N+1:n*N) = r_cp*sin(blade_azim);
-    
-    bound.radialcentrepoint((n-1)*N+1:n*N) = sqrt(dot(bound.centrepoint(:,(n-1)*N+1:n*N),...
-        bound.centrepoint(:,(n-1)*N+1:n*N)));
-    
-    % trailing vortices
-    for i=1:N+1 % loop over bound vortices
-        r = r_R(i);
-        c = chord_distribution(i);
-        beta = -deg2rad(twist_distribution(i));
-        
-        % 1st trailing vortex
-        temp1.x(i) = bound.x((n-1)*(N+1)+i)+1*c*cos(beta);
-        temp1.y(i) = bound.y((n-1)*(N+1)+i)-1*c*sin(beta)*sin(blade_azim);
-        temp1.z(i) = bound.z((n-1)*(N+1)+i)+1*c*sin(beta)*cos(blade_azim);
-        
-        trail.x = [trail.x,temp1.x(i)];
-        trail.y = [trail.y,temp1.y(i)];
-        trail.z = [trail.z,temp1.z(i)];
-        
-        for j = 1:length(theta_array)-1
-            dx = (theta_array(j+1)-theta_array(j))/tipspeedratio*Radius;
-            dy = r_R(i)*Radius*(cos(-theta_array(j+1)+blade_azim)-cos(-theta_array(j)+blade_azim));%
-            dz = r_R(i)*Radius*(sin(-theta_array(j+1)+blade_azim)-sin(-theta_array(j)+blade_azim));%
-            temp1.x = trail.x(end)+dx;
-            temp1.y = trail.y(end)+dy;
-            temp1.z = trail.z(end)+dz;
-            trail.x = [trail.x, temp1.x];
-            trail.y = [trail.y, temp1.y];
-            trail.z = [trail.z, temp1.z];
-        end
-    end
-end
 
-trail.x = reshape(trail.x,length(theta_array),NBlades*length(r_R));
-trail.y = reshape(trail.y,length(theta_array),NBlades*length(r_R));
-trail.z = reshape(trail.z,length(theta_array),NBlades*length(r_R));
+%start with one blade, then rotate to get points on the rest of the blades
+%% control points at centre of bound vortex/0.75 chord
+bound.cpcoord(1,:) = zeros(1,N);%x
+bound.cpcoord(2,:) = 0.5*(r_R(2:end)+r_R(1:end-1))*Radius;%y
+bound.cpcoord(3,:) = zeros(1,N);%z
 
-
-% plot system - for checking
+%checking
+scatter3(bound.cpcoord(1,:),bound.cpcoord(2,:), bound.cpcoord(3,:), 'bo');
+xlabel('x');
+ylabel('y');
+zlabel('z');
 hold on
-scatter3(cp.coordinates(1,:), cp.coordinates(2,:), cp.coordinates(3,:), 10, 'filled', 'r')
-scatter3(bound.centrepoint(1,:), bound.centrepoint(2,:), bound.centrepoint(3,:),'r*');
-for n=1:NBlades
-    plot3(bound.x((n-1)*(N+1)+1:n*(N+1)), bound.y((n-1)*(N+1)+1:n*(N+1)), bound.z((n-1)*(N+1)+1:n*(N+1)), '-k+')
-    for i=1:N+1
-        plot3([trail.x(1,(n-1)*(N+1)+i), bound.x((n-1)*(N+1)+i)], ...
-            [trail.y(1,(n-1)*(N+1)+i), bound.y((n-1)*(N+1)+i)], [trail.z(1,(n-1)*(N+1)+i), bound.z((n-1)*(N+1)+i)], '--bo')
-        plot3(trail.x(:,(n-1)*(N+1)+i), trail.y(:,(n-1)*(N+1)+i), trail.z(:,(n-1)*(N+1)+i), '--r')
+%% normal and tangential vector of control point
+bound.normal = [cos(cp_twist);zeros(1,N);-sin(cp_twist)];
+bound.tangential = [-sin(cp_twist);zeros(1,N);-cos(cp_twist)];
+%% bound vortices
+bound.x = zeros(1,N+1);
+bound.y = r_R*Radius;
+bound.z = zeros(1,N+1);
+
+for i = 1:N
+    plot3([bound.x(i),bound.x(i+1)],...
+        [bound.y(i),bound.y(i+1)],...
+        [bound.z(i),bound.z(i+1)],'k-x');
+end
+%% trailing vortices
+%first pair of trailing vortices
+trail.x = zeros(length(theta_array)+1,N+1);
+trail.y = zeros(length(theta_array)+1,N+1);
+trail.z = zeros(length(theta_array)+1,N+1);
+
+trail.x(1,:) = bound.x;
+trail.y(1,:) = bound.y;
+trail.z(1,:) = bound.z;
+
+trail.x(2,:) = trail.x(1,:) - c.*sin(twist);
+trail.y(2,:) = trail.y(1,:);
+trail.z(2,:) = trail.z(1,:) - c.*cos(twist);
+
+for i = 1:N+1
+    plot3([trail.x(1,i), trail.x(2,i)],[trail.y(1,i), trail.y(2,i)],...
+        [trail.z(1,i), trail.z(2,i)],'k--+');
+end
+
+%trailing vortices in wake
+for i = 1:N+1
+    for j = 1:length(theta_array)-1
+        dx = (theta_array(j+1)-theta_array(j))/tipspeedratio*Radius;
+        dy = r_R(i)*Radius*(cos(-theta_array(j+1))-cos(-theta_array(j)));%
+        dz = r_R(i)*Radius*(sin(-theta_array(j+1))-sin(-theta_array(j)));%
+        trail.x(j+2,i) = trail.x(j+1,i) + dx;
+        trail.y(j+2,i) = trail.y(j+1,i) + dy; 
+        trail.z(j+2,i) = trail.z(j+1,i) + dz; 
     end
 end
-%     hold off
-xlabel("x")
-ylabel("y")
-zlabel("z")
 
-trail.x = [bound.x;trail.x];
-trail.y = [bound.y;trail.y];
-trail.z = [bound.z;trail.z];
+Nfil = length(trail.x(:,1));
 
-trail.x = flip(trail.x);
-trail.y = flip(trail.y);
-trail.z = flip(trail.z);
-ring.x = [];
-ring.y = [];
-ring.z = [];
-idxfilaments = [1:N+1];
-for n = 1:NBlades
-    filaments.x = trail.x(:,idxfilaments+(n-1)*(N+1));
-    filaments.y = trail.y(:,idxfilaments+(n-1)*(N+1));
-    filaments.z = trail.z(:,idxfilaments+(n-1)*(N+1));
+for i = 1:N+1
+    plot3(trail.x(:,i), trail.y(1:end,i), trail.z(1:end,i),'r--');
+end
+%% Ring
+for i = 1:N
+    ring.x(:,i) = [flip(trail.x(:,i));trail.x(:,i+1)];
+    ring.y(:,i) = [flip(trail.y(:,i));trail.y(:,i+1)];
+    ring.z(:,i) = [flip(trail.z(:,i));trail.z(:,i+1)];
+end
+
+%% Rotation
+bladeAzim = linspace(0,2*pi,NBlades+1);
+bladeAzim = bladeAzim(2:end-1);
+
+for krot = 1:length(bladeAzim)
     for i = 1:N
-        temp2.x(:,i) = [filaments.x(:,i);flip(filaments.x(:,i+1))];
-        temp2.y(:,i) = [filaments.y(:,i);flip(filaments.y(:,i+1))];
-        temp2.z(:,i) = [filaments.z(:,i);flip(filaments.z(:,i+1))];
+        newcpcoord(:,i) = Rotate(bound.cpcoord(:,i),bladeAzim(krot));
+        newnormal(:,i) = Rotate(bound.normal(:,i),bladeAzim(krot));
+        newtangential(:,i) = Rotate(bound.tangential(:,i),bladeAzim(krot));
     end
-    ring.x = [ring.x, temp2.x];
-    ring.y = [ring.y, temp2.y];
-    ring.z = [ring.z, temp2.z];
+    bound.normal = [bound.normal, newnormal];
+    bound.tangential = [bound.tangential, newtangential];
+    bound.cpcoord = [bound.cpcoord, newcpcoord];
+    scatter3(newcpcoord(1,:),newcpcoord(2,:),newcpcoord(3,:),'bo');
 end
-
+for krot = 1:length(bladeAzim)
+    rotatedrings_x = ring.x;
+    rotatedrings_y = ring.y*cos(bladeAzim(krot)) - ring.z*sin(bladeAzim(krot));% y positions
+    rotatedrings_z = ring.y*sin(bladeAzim(krot)) + ring.z*cos(bladeAzim(krot));% z positions
+    for i = 1:N   
+        plot3(rotatedrings_x(1:Nfil,i),...
+            rotatedrings_y(1:Nfil,i),...
+            rotatedrings_z(1:Nfil,i),'r--');
+        plot3(rotatedrings_x(Nfil:Nfil+1,i),...
+            rotatedrings_y(Nfil:Nfil+1,i),...
+            rotatedrings_z(Nfil:Nfil+1,i),'k-x');
+        plot3(rotatedrings_x(Nfil+1:end,i),...
+            rotatedrings_y(Nfil+1:end,i),...
+            rotatedrings_z(Nfil+1:end,i),'r--');
+    end
+    ring.x = [ring.x, rotatedrings_x];
+    ring.y = [ring.y, rotatedrings_y];
+    ring.z = [ring.z, rotatedrings_z];
+end
+if sec_rot == 1
+    bound.Totalcp = N*NBlades*2;
+elseif sec_rot == 0
+    bound.Totalcp = N*NBlades;
+else
+    disp('Invalid value of sec_rot, proceeding to use single rotor only');
+    bound.Totalcp = N*NBlades;
+end
+ 
 if sec_rot==1 % 2nd rotor
     SeparationDist = 2*(2*Radius);
     phase = deg2rad(80);
     cosphase = cos(phase);
     sinephase = sin(phase);
     
-    transformed(1,:) = cp.coordinates(1,:);
-    transformed(2,:) = (cp.coordinates(2,:))*cosphase - cp.coordinates(3,:)*sinephase +SeparationDist;
-    transformed(3,:) = (cp.coordinates(2,:))*sinephase + cp.coordinates(3,:)*cosphase;
-    scatter3(transformed(1,:), transformed(2,:), transformed(3,:), 10, 'filled', 'r')
-    cp.coordinates = [cp.coordinates, transformed];
     
+    transformed(1,:) = bound.normal(1,:);
+    transformed(2,:) = (bound.normal(2,:))*cosphase - bound.normal(3,:)*sinephase ;
+    transformed(3,:) = (bound.normal(2,:))*sinephase + bound.normal(3,:)*cosphase;
+    bound.normal = [bound.normal, transformed];
     clear transformed
-    transformed(1,:) = bound.centrepoint(1,:);
-    transformed(2,:) = (bound.centrepoint(2,:))*cosphase - bound.centrepoint(3,:)*sinephase +SeparationDist;
-    transformed(3,:) = (bound.centrepoint(2,:))*sinephase + bound.centrepoint(3,:)*cosphase;
-    scatter3(transformed(1,:),transformed(2,:), transformed(3,:),'r*');
-    bound.centrepoint = [bound.centrepoint, transformed];
+    
+    transformed(1,:) = bound.tangential(1,:);
+    transformed(2,:) = (bound.tangential(2,:))*cosphase - bound.tangential(3,:)*sinephase;
+    transformed(3,:) = (bound.tangential(2,:))*sinephase + bound.tangential(3,:)*cosphase;
+    bound.tangential = [bound.tangential, transformed];
+    clear transformed
+   
+    clear transformed
+    transformed(1,:) = bound.cpcoord(1,:);
+    transformed(2,:) = (bound.cpcoord(2,:))*cosphase - bound.cpcoord(3,:)*sinephase +SeparationDist;
+    transformed(3,:) = (bound.cpcoord(2,:))*sinephase + bound.cpcoord(3,:)*cosphase;
+    scatter3(transformed(1,:),transformed(2,:), transformed(3,:),'o');
+    bound.cpcoord = [bound.cpcoord, transformed];
     
     
     clear transformed
@@ -148,12 +163,14 @@ if sec_rot==1 % 2nd rotor
     ring.y = [ring.y, transformed(:,:,2)];
     ring.z = [ring.z, transformed(:,:,3)];
 end
+ 
+bound.cp_radialpos = sqrt(dot(bound.cpcoord,bound.cpcoord,1));
 
-cp.Totalcp = N*NBlades;
+% checkvectors = dot(bound.normal, bound.tangential,1);
+
+
 results.ring = ring;
-results.NBlades = NBlades;
-results.cp = cp;
+results.NBlades = NBlades;%blade on each rotor for now
 results.bound = bound;
-results.trail = trail;
 results.NpanelsPerBlade = N;
 end

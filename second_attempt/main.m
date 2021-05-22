@@ -6,7 +6,7 @@ close all
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 8;  % number of segments
+N = 20;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
 spacing = 1;
@@ -23,13 +23,13 @@ NBlades = 3;    % number of blades
 a_wake = 0.2602;   % average induction at the rotor, from BEM
 Omega = norm(windvel)*TSR/Radius;
 
-Nrotations = 0.5;   % for the wake
+Nrotations = 15;   % for the wake
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 
 %% second rotor
-sec_rot = 0 ; % is there a second rotor
+sec_rot = 2 ; % is there a second rotor
 
 %% LLT calculations
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot);

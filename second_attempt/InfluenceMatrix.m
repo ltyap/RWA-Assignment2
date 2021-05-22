@@ -5,7 +5,7 @@ function [InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades)
     ring = RotorWakeSystem.ring;
     Npan = RotorWakeSystem.NpanelsPerBlade;
     Gamma = 1;  
-    Ncp = RotorWakeSystem.cp.Totalcp;   
+    Ncp = bound.Totalcp;   
     
     UMat = zeros(Ncp,Npan*NBlades);
     VMat = zeros(Ncp,Npan*NBlades);
@@ -13,7 +13,7 @@ function [InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades)
     
     idx = [1:Npan];
     for icp = 1:Ncp
-        localcp = bound.centrepoint(:,icp);
+        localcp = bound.cpcoord(:,icp);
         for iBlade = 1:NBlades
             RingOnBlade.x = ring.x(:,idx+(iBlade-1)*Npan);
             RingOnBlade.y = ring.y(:,idx+(iBlade-1)*Npan);
