@@ -69,7 +69,7 @@ end
 Nfil = length(trail.x(:,1));
 
 for i = 1:N+1
-    plot3(trail.x(:,i), trail.y(1:end,i), trail.z(1:end,i),'r--');
+    plot3(trail.x(:,i), trail.y(1:end,i), trail.z(1:end,i),'r--x');
 end
 %% Ring
 for i = 1:N
@@ -94,19 +94,19 @@ for krot = 1:length(bladeAzim)
     scatter3(newboundcpcoord(1,:),newboundcpcoord(2,:),newboundcpcoord(3,:),'bo');
 end
 for krot = 1:length(bladeAzim)
-    rotatedrings_x = ring.x;
-    rotatedrings_y = ring.y*cos(bladeAzim(krot)) - ring.z*sin(bladeAzim(krot));% y positions
-    rotatedrings_z = ring.y*sin(bladeAzim(krot)) + ring.z*cos(bladeAzim(krot));% z positions
+    rotatedrings_x = ring.x(:,1:N);
+    rotatedrings_y = ring.y(:,1:N)*cos(bladeAzim(krot)) - ring.z(:,1:N)*sin(bladeAzim(krot));% y positions
+    rotatedrings_z = ring.y(:,1:N)*sin(bladeAzim(krot)) + ring.z(:,1:N)*cos(bladeAzim(krot));% z positions
     for i = 1:N   
         plot3(rotatedrings_x(1:Nfil,i),...
             rotatedrings_y(1:Nfil,i),...
-            rotatedrings_z(1:Nfil,i),'r--');
+            rotatedrings_z(1:Nfil,i),'r--x');
         plot3(rotatedrings_x(Nfil:Nfil+1,i),...
             rotatedrings_y(Nfil:Nfil+1,i),...
             rotatedrings_z(Nfil:Nfil+1,i),'k-x');
         plot3(rotatedrings_x(Nfil+1:end,i),...
             rotatedrings_y(Nfil+1:end,i),...
-            rotatedrings_z(Nfil+1:end,i),'r--');
+            rotatedrings_z(Nfil+1:end,i),'r--x');
     end
     ring.x = [ring.x, rotatedrings_x];
     ring.y = [ring.y, rotatedrings_y];
@@ -114,11 +114,14 @@ for krot = 1:length(bladeAzim)
 end
 if sec_rot == 1
     bound.Totalcp = N*NBlades*2;
+    Nrotor = 2;
 elseif sec_rot == 0
     bound.Totalcp = N*NBlades;
+    Nrotor = 1;
 else
     disp('Invalid value of sec_rot, proceeding to use single rotor only');
     bound.Totalcp = N*NBlades;
+    Nrotor = 1;
 end
  
 if sec_rot==1 % 2nd rotor
@@ -156,7 +159,7 @@ if sec_rot==1 % 2nd rotor
         for i=1:N
             plot3(transformed(:,(n-1)*N+i,1),...
                 transformed(:,(n-1)*N+i,2),...
-                transformed(:,(n-1)*N+i,3), 'b');
+                transformed(:,(n-1)*N+i,3), 'b-x');
         end
     end
     ring.x = [ring.x, transformed(:,:,1)];
@@ -174,7 +177,7 @@ end
 
 
 results.ring = ring;
-results.NBlades = NBlades;%blade on each rotor for now
+results.NBlades = NBlades*Nrotor;%blade on each rotor for now
 results.bound = bound;
 results.NpanelsPerBlade = N;
 end

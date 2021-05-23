@@ -19,7 +19,7 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(Inf
     Fnorm = zeros(Ncp,1);
     Ftan = zeros(Ncp,1);
     Niter = 1000;   % maximum number of performed iterations
-    errorlimit = 0.0001;    % error tolerance for the iterative process
+    errorlimit = 1e-4;    % error tolerance for the iterative process
     
     for i=1:Niter
         Gamma = GammaNew;   % update bound circulation
@@ -72,7 +72,7 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(Inf
         end
         
         % set new estimate of bound circulation
-        GammaNew = 0.7*Gamma + 0.3*GammaNew;
+        GammaNew = 0.75*Gamma + 0.25*GammaNew;
         disp(['Iter count:',num2str(i)]);
     end % end iteration loop
 
