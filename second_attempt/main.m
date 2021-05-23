@@ -6,17 +6,15 @@ close all
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 13;  % number of segments
+N = 11;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
 spacing = 0;
 [r_R] = RadialSpacing(N, TipLocation_R, RootLocation_R, spacing);
-% it can't converge with current definition of error bound using cosine
-% spacing. Might have to try relaxing error or mess with other
-% parameters. The results seem to be alright though, just not fine at the
-% root
+%i think it works for: N = 11, error tolerance = 1e-4 and Nrotations = 15,
+%Separation distance  = 4D
 %% flow conditions - same as in BEM model
-windvel = [10,0,0];      % freestream velocity [m/s]
+windvel = [10,0,0];% freestream velocity [m/s]
 altitude = 0;%[km]
 [~, ~, pinf, rho] = atmosisa(altitude);
 %% rotor parameters
@@ -26,11 +24,10 @@ NBlades = 3;    % number of blades
 a_wake = 0.2602;   % average induction at the rotor, from BEM
 Omega = norm(windvel)*TSR/Radius;
 
-Nrotations = 10;   % for the wake
+Nrotations = 15;   % for the wake
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
-
 %% second rotor
 sec_rot = 1; % is there a second rotor
 %% LLT calculations

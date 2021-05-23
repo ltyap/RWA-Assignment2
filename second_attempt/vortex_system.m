@@ -174,8 +174,6 @@ if sec_rot==1
     bound.cp_radialpos = [bound.cp_radialpos, sqrt(dot(temp,temp,1))];
 end
 % checkvectors = dot(bound.normal, bound.tangential,1);
-
-
 results.ring = ring;
 results.NBlades = NBlades*Nrotor;%blade on each rotor for now
 results.bound = bound;

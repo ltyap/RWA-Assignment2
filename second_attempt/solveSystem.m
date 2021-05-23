@@ -8,10 +8,9 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(Inf
     Vinf = wind(2);
     Winf = wind(3);
     
-    NBlades = RotorWakeSystem.NBlades;% per rotor
     bound = RotorWakeSystem.bound;
-    Ncp = bound.Totalcp;  % as many points as there are panels
-    Nrings = RotorWakeSystem.NpanelsPerBlade*NBlades;   % as many horseshoes as there are panels
+    Ncp = bound.Totalcp; 
+    Nrings = Ncp;   % as many horseshoes as there are panels
     GammaNew = ones(Ncp,1); % initial guess, defined in control points
     a = zeros(Ncp,1);
     aline = zeros(Ncp,1);
@@ -32,7 +31,8 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(Inf
             u=0; % initialize velocity at control point
             v=0;
             w=0;
-            % multiply icp line of Matrix with vector of circulation Gamma to calculate velocity at controlpoint
+            % multiply icp line of Matrix with vector of circulation Gamma 
+            % to calculate velocity at controlpoint
             for jring = 1:Nrings % loop over all vortex rings
                 u = u + UMat(icp,jring)*Gamma(jring); % axial component of velocity
                 v = v + VMat(icp,jring)*Gamma(jring); % y-component of velocity
