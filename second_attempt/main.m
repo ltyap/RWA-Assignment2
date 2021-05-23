@@ -32,13 +32,17 @@ theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 
 %% second rotor
-sec_rot = 0; % is there a second rotor
+sec_rot = 1; % is there a second rotor
 %% LLT calculations
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot);
 
-[InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem, NBlades);
+[InfluenceMatrix] = InfluenceMatrix(sec_rot, RotorWakeSystem, NBlades);
 [a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
-[CT, CP, CQ, ct, cp, cq] = CT_CPcalculations(Fnorm, Ftan, windvel(1), r_R, r_R_cp, Omega, Radius, NBlades);
+%QUICKFIX
+if sec_rot==1
+r_R_cp = [r_R_cp(1:N*NBlades);r_R_cp(1:N*NBlades)];
+end
+[CT, CP, CQ, ct, cp, cq] = CT_CPcalculations(N,Fnorm, Ftan, windvel(1), r_R, r_R_cp, Omega, Radius, NBlades, sec_rot);
 
 % %%%%%% FROM BEM %%%%%%%%%
 % % CT = 0.6553;
@@ -50,4 +54,5 @@ load('tsr8.mat');
 load('tsr10.mat');
 
 
-plotting_func(windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
+
+plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
