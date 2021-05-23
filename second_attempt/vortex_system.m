@@ -159,7 +159,7 @@ if sec_rot==1 % 2nd rotor
         for i=1:N
             plot3(transformed(:,(n-1)*N+i,1),...
                 transformed(:,(n-1)*N+i,2),...
-                transformed(:,(n-1)*N+i,3), 'b-x');
+                transformed(:,(n-1)*N+i,3), 'r-');
         end
     end
     ring.x = [ring.x, transformed(:,:,1)];

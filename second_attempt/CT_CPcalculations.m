@@ -6,8 +6,8 @@ drtemp = drtemp(:);
 if sec_rot==1
     drtemp = [drtemp; drtemp];
 end
-ct_r = (drtemp.*Fnorm)/(0.5*Uinf*Uinf*pi*Radius);
-cp_r = (drtemp.*Ftan.*r_R_cp.*Omega)/(0.5*(Uinf^3)*pi);
+ct_r = (drtemp.*Fnorm*NBlades)/(0.5*Uinf^2*pi*Radius^2);
+cp_r = (drtemp.*Ftan.*r_R_cp.*Omega*Radius*NBlades)/(0.5*(Uinf^3)*pi*Radius^2);
 cq_r = cp_r/Omega;
 
 if sec_rot==1

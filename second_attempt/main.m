@@ -6,7 +6,7 @@ close all
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 50;  % number of segments
+N = 30;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
 spacing = 1;
@@ -24,7 +24,7 @@ NBlades = 3;    % number of blades
 a_wake = 0.2602;   % average induction at the rotor, from BEM
 Omega = norm(windvel)*TSR/Radius;
 
-Nrotations = 15;   % for the wake
+Nrotations = 10;   % for the wake
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
@@ -54,4 +54,4 @@ plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp
 
 %% saving data to file
 results_llt = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow'];
-save('results_llt.mat','results_llt');
+save('results_llt_N30.mat','results_llt');

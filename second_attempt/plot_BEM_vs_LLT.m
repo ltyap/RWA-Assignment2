@@ -9,9 +9,9 @@ Radius=50;
 Omega=norm(windvel)*TSR/Radius;
 NBlades=3;
 
-load('results_llt.mat')
+load('results_llt_N30.mat')
 llt_N = length(results_llt)/NBlades;
-load('results_bem.mat');
+load('results_bem_N80.mat');
 bem_N = length(results_bem);
 
 colors = ['r'; 'b'; 'g'; 'm'; 'y']; % define color scheme, more colors need to be added for larger analysis
@@ -72,8 +72,8 @@ hold off
 %% CT
 figure()
 hold on
-plot(results_llt(1:llt_N,1), results_llt(1:llt_N,4), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
-plot(results_bem(:,1), results_bem(:,4), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
+plot(results_llt(1:llt_N,1), results_llt(1:llt_N,4),'DisplayName',sprintf('LLT'))
+plot(results_bem(:,1), results_bem(:,4), 'DisplayName',sprintf('BEM'))
 title('C_T')
 grid on
 grid minor
