@@ -6,10 +6,10 @@ close all
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 11;  % number of segments
+N = 50;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
-spacing = 0;
+spacing = 1;
 [r_R] = RadialSpacing(N, TipLocation_R, RootLocation_R, spacing);
 %i think it works for: N = 11, error tolerance = 1e-4 and Nrotations = 15,
 %Separation distance  = 4D
@@ -29,7 +29,7 @@ theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 %% second rotor
-sec_rot = 1; % is there a second rotor
+sec_rot = 0; % is there a second rotor
 %% LLT calculations
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot);
 
@@ -46,10 +46,12 @@ end
 % % CQ = 0.2801;
 % % CP = 0.4482;
 
-load('tsr6.mat');
-load('tsr8.mat');
-load('tsr10.mat');
-
-
+% load('tsr6.mat');
+% load('tsr8.mat');
+% load('tsr10.mat');
 
 plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
+
+%% saving data to file
+results_llt = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow'];
+save('results_llt.mat','results_llt');
