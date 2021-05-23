@@ -164,8 +164,12 @@ if sec_rot==1 % 2nd rotor
     ring.z = [ring.z, transformed(:,:,3)];
 end
  
-bound.cp_radialpos = sqrt(dot(bound.cpcoord,bound.cpcoord,1));
-
+% bound.cp_radialpos = sqrt(dot(bound.cpcoord,bound.cpcoord,1));
+bound.cp_radialpos = sqrt(dot(bound.cpcoord(:,1:N*NBlades),bound.cpcoord(:,1:N*NBlades,:),1));
+if sec_rot==1
+    temp = [bound.cpcoord(1,N*NBlades+1:end); bound.cpcoord(2,N*NBlades+1:end)-SeparationDist; bound.cpcoord(3,N*NBlades+1:end)];
+    bound.cp_radialpos = [bound.cp_radialpos, sqrt(dot(temp,temp,1))];
+end
 % checkvectors = dot(bound.normal, bound.tangential,1);
 
 
