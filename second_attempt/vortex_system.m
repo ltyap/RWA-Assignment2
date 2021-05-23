@@ -22,7 +22,7 @@ xlabel('x');
 ylabel('y');
 zlabel('z');
 hold on
-%% normal and tangential vector of control point
+%% normal and tangential vector of control point (for no normal flow condition)
 bound.normal = [cos(cp_twist);zeros(1,N);-sin(cp_twist)];
 bound.tangential = [-sin(cp_twist);zeros(1,N);-cos(cp_twist)];
 %% bound vortices
