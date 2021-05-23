@@ -45,9 +45,9 @@ trail.x(1,:) = bound.x;
 trail.y(1,:) = bound.y;
 trail.z(1,:) = bound.z;
 
-trail.x(2,:) = trail.x(1,:) - c.*sin(twist);
+trail.x(2,:) = trail.x(1,:) - c.*sin(-twist);
 trail.y(2,:) = trail.y(1,:);
-trail.z(2,:) = trail.z(1,:) - c.*cos(twist);
+trail.z(2,:) = trail.z(1,:) - c.*cos(-twist);
 
 for i = 1:N+1
     plot3([trail.x(1,i), trail.x(2,i)],[trail.y(1,i), trail.y(2,i)],...
@@ -69,7 +69,7 @@ end
 Nfil = length(trail.x(:,1));
 
 for i = 1:N+1
-    plot3(trail.x(:,i), trail.y(1:end,i), trail.z(1:end,i),'r--x');
+    plot3(trail.x(:,i), trail.y(1:end,i), trail.z(1:end,i),'r--');
 end
 %% Ring
 for i = 1:N
@@ -100,13 +100,13 @@ for krot = 1:length(bladeAzim)
     for i = 1:N   
         plot3(rotatedrings_x(1:Nfil,i),...
             rotatedrings_y(1:Nfil,i),...
-            rotatedrings_z(1:Nfil,i),'r--x');
+            rotatedrings_z(1:Nfil,i),'r--');
         plot3(rotatedrings_x(Nfil:Nfil+1,i),...
             rotatedrings_y(Nfil:Nfil+1,i),...
-            rotatedrings_z(Nfil:Nfil+1,i),'k-x');
+            rotatedrings_z(Nfil:Nfil+1,i),'k-');
         plot3(rotatedrings_x(Nfil+1:end,i),...
             rotatedrings_y(Nfil+1:end,i),...
-            rotatedrings_z(Nfil+1:end,i),'r--x');
+            rotatedrings_z(Nfil+1:end,i),'r--');
     end
     ring.x = [ring.x, rotatedrings_x];
     ring.y = [ring.y, rotatedrings_y];
