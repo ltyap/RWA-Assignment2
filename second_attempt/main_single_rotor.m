@@ -8,6 +8,7 @@ N = 20;
 spacing = 1; % 1- uniform, 0-cosine
 L=0;    % distance between 2 rotors
 sec_rot=0;  % is there a second rotor
+Nrotations = 10; %number of rotations done by the rotor (length of wake)
 
 % [CT,CP,CQ] = lifting_line_loop(N,spacing,L, sec_rot,a_wake_bem);
 
@@ -18,8 +19,8 @@ sec_rot=0;  % is there a second rotor
 % assumed convection speed of wake
 a_wake = [0,0.25,a_wake_bem, 0.5,0.75];
 for i=1:length(a_wake)
-    [CT_a(i),CP_a(i),CQ_a(i), results_a] = lifting_line_loop(N,spacing,L, sec_rot,a_wake(i));
-    filename = "results_llt_N"+N+"a_"+a_wake(i)+".mat";;
+    [CT_a(i),CP_a(i),CQ_a(i), results_a] = lifting_line_loop(N,spacing,L, sec_rot,a_wake(i), Nrotations);
+    filename = "results_llt_N"+N+"a_"+a_wake(i)+".mat";
     save(filename,'results_a');
 end
 plot_compare(a_wake,N);

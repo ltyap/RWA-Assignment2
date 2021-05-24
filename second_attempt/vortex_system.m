@@ -33,7 +33,7 @@ bound.z = zeros(1,N+1);
 for i = 1:N
     plot3([bound.x(i),bound.x(i+1)],...
         [bound.y(i),bound.y(i+1)],...
-        [bound.z(i),bound.z(i+1)],'k-x');
+        [bound.z(i),bound.z(i+1)],'k-');
 end
 %% trailing vortices
 %first pair of trailing vortices
@@ -51,7 +51,7 @@ trail.z(2,:) = trail.z(1,:) - c.*cos(-twist);
 
 for i = 1:N+1
     plot3([trail.x(1,i), trail.x(2,i)],[trail.y(1,i), trail.y(2,i)],...
-        [trail.z(1,i), trail.z(2,i)],'k--+');
+        [trail.z(1,i), trail.z(2,i)],'k--');
 end
 
 %trailing vortices in wake
