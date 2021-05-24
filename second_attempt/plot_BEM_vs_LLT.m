@@ -9,9 +9,9 @@ Radius=50;
 Omega=norm(windvel)*TSR/Radius;
 NBlades=3;
 
-load('results_llt_N30.mat')
+load('results_llt_N20.mat')
 llt_N = length(results_llt)/NBlades;
-load('results_bem_N80.mat');
+load('results_bem_N20.mat');
 bem_N = length(results_bem);
 
 colors = ['r'; 'b'; 'g'; 'm'; 'y']; % define color scheme, more colors need to be added for larger analysis
@@ -72,8 +72,8 @@ hold off
 %% CT
 figure()
 hold on
-plot(results_llt(1:llt_N,1), results_llt(1:llt_N,4),'DisplayName',sprintf('LLT'))
-plot(results_bem(:,1), results_bem(:,4), 'DisplayName',sprintf('BEM'))
+plot(results_llt(1:llt_N,1), NBlades*results_llt(1:llt_N,4), '-', 'Color', colors(1),'DisplayName',sprintf('LLT'))
+plot(results_bem(:,1), results_bem(:,4), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
 title('C_T')
 grid on
 grid minor
@@ -84,7 +84,7 @@ hold off
 %% CP
 figure()
 hold on
-plot(results_llt(1:llt_N,1), results_llt(1:llt_N,5), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
+plot(results_llt(1:llt_N,1), NBlades*results_llt(1:llt_N,5), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
 plot(results_bem(:,1), results_bem(:,5), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
 title('C_P')
 grid on
@@ -96,7 +96,7 @@ hold off
 %% CQ
 figure()
 hold on
-plot(results_llt(1:llt_N,1), results_llt(1:llt_N,6), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
+plot(results_llt(1:llt_N,1), NBlades*results_llt(1:llt_N,6), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
 plot(results_bem(:,1), results_bem(:,6), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
 title('C_Q')
 grid on
@@ -113,6 +113,30 @@ hold on
 plot(results_llt(1:llt_N,1), results_llt(1:llt_N,7), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
 plot(results_bem(:,1), results_bem(:,7), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
 title('Circulation distribution (non-dimensionalized by \pi U_\infty^2 / \Omega N_{blades})')
+grid on
+grid minor
+xlabel('r/R')
+legend show
+hold off
+
+%% Fnorm
+figure()
+hold on
+plot(results_llt(1:llt_N,1), results_llt(1:llt_N,10), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
+plot(results_bem(:,1), results_bem(:,10), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
+title('Fnorm')
+grid on
+grid minor
+xlabel('r/R')
+legend show
+hold off
+
+%% Ftan
+figure()
+hold on
+plot(results_llt(1:llt_N,1), results_llt(1:llt_N,11), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
+plot(results_bem(:,1), results_bem(:,11), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
+title('Ftan')
 grid on
 grid minor
 xlabel('r/R')

@@ -6,7 +6,7 @@ close all
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 30;  % number of segments
+N = 20;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
 spacing = 1;
@@ -37,7 +37,7 @@ RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlade
 [a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
 %QUICKFIX
 if sec_rot==1
-r_R_cp = [r_R_cp(1:N*NBlades);r_R_cp(1:N*NBlades)];
+    r_R_cp = [r_R_cp(1:N*NBlades);r_R_cp(1:N*NBlades)];
 end
 [CT, CP, CQ, ct, cp, cq] = CT_CPcalculations(N,Fnorm, Ftan, windvel(1), r_R, r_R_cp, Omega, Radius, NBlades, sec_rot);
 
@@ -53,5 +53,10 @@ end
 plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
 
 %% saving data to file
-results_llt = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow'];
-save('results_llt_N30.mat','results_llt');
+results_llt = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow', Fnorm, Ftan];
+if sec_rot==1
+    filename = "results_llt_dual_N"+N+".mat";
+else
+    filename = "results_llt_N"+N+".mat";
+end
+save(filename,'results_llt');
