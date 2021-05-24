@@ -1,4 +1,4 @@
-function [CT,CP,CQ] = lifting_line_loop(N,spacing,L, sec_rot)
+function [CT,CP,CQ, results] = lifting_line_loop(N,spacing,L, sec_rot, a_wake, Nrotations)
 %% Assignment 2 of RWA - lifting line model
 %% define the blade geometry - same as in BEM model
 % blade discretisation
@@ -19,10 +19,10 @@ altitude = 0;%[km]
 TSR = 8;        % tip speed ratios we want to calculate
 Radius = 50;    % blade radius(length) [m]
 NBlades = 3;    % number of blades
-a_wake = 0.2602;   % average induction at the rotor, from BEM
+%a_wake = 0.2602;   % average induction at the rotor, from BEM
 Omega = norm(windvel)*TSR/Radius;
 
-Nrotations = 10;   % for the wake
+% Nrotations = 10;   % for the wake
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
@@ -31,7 +31,7 @@ Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot,L);
 
 [InfluenceMatrix] = influence_matrix(RotorWakeSystem);
-[a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
+[a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow, conv]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
 %QUICKFIX
 if sec_rot==1
     r_R_cp = [r_R_cp(1:N*NBlades);r_R_cp(1:N*NBlades)];
@@ -47,14 +47,14 @@ end
 % load('tsr8.mat');
 % load('tsr10.mat');
 
-plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
+%plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp,cq, GammaNew, alpha, inflow);
 
 %% saving data to file
-results_llt = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow', Fnorm, Ftan];
-if sec_rot==1
-    filename = "results_llt_dual_N"+N+"L_"+L+".mat";
-else
-    filename = "results_llt_N"+N+".mat";
-end
-save(filename,'results_llt');
+results = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow', Fnorm, Ftan];
+% if sec_rot==1
+%     filename = "results_llt_dual_N"+N+"L_"+L+".mat";
+% else
+%     filename = "results_llt_N"+N+".mat";
+% end
+% save(filename,'results_llt');
 end

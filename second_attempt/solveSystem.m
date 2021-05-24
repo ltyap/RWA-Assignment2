@@ -1,4 +1,4 @@
-function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow] = solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, wind)
+function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow, i] = solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, wind)
     
     UMat = InfluenceMatrix.U;
     VMat = InfluenceMatrix.V;
