@@ -1,15 +1,13 @@
+function [CT,CP,CQ] = lifting_line_loop(N,spacing,L, sec_rot)
 %% Assignment 2 of RWA - lifting line model
-clc
-clear all
-close all
 %% define the blade geometry - same as in BEM model
 % blade discretisation
 TipLocation_R =  1;     % non-dimensional
 RootLocation_R =  0.2;  % non-dimensional
-N = 20;  % number of segments
+%N = 20;  % number of segments
 
 % spacing: 1 for uniform, 0 for cosine
-spacing = 1;
+% spacing = 1;
 [r_R] = RadialSpacing(N, TipLocation_R, RootLocation_R, spacing);
 %i think it works for: N = 11, error tolerance = 1e-4 and Nrotations = 15,
 %Separation distance  = 4D
@@ -28,12 +26,11 @@ Nrotations = 10;   % for the wake
 theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
-%% second rotor
-sec_rot = 0; % is there a second rotor
-%% LLT calculations
-RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot);
 
-[InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem);
+%% LLT calculations
+RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot,L);
+
+[InfluenceMatrix] = influence_matrix(RotorWakeSystem);
 [a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
 %QUICKFIX
 if sec_rot==1
@@ -55,8 +52,9 @@ plotting_func(sec_rot,windvel,Radius, N, NBlades, Omega, a, aline, r_R_cp, ct,cp
 %% saving data to file
 results_llt = [r_R_cp,a,aline,ct,cp,cq,GammaNew,alpha',inflow', Fnorm, Ftan];
 if sec_rot==1
-    filename = "results_llt_dual_N"+N+".mat";
+    filename = "results_llt_dual_N"+N+"L_"+L+".mat";
 else
     filename = "results_llt_N"+N+".mat";
 end
 save(filename,'results_llt');
+end

@@ -1,4 +1,4 @@
-function [InfluenceMatrix] = InfluenceMatrix(RotorWakeSystem)
+function [InfluenceMatrix] = influence_matrix(RotorWakeSystem)
 bound = RotorWakeSystem.bound;
 ring = RotorWakeSystem.ring;
 Npan = RotorWakeSystem.NpanelsPerBlade;

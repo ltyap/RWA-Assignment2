@@ -1,7 +1,4 @@
 %% plotting BEM vs LLT
-clc
-clear all
-close all
 
 windvel = [10,0,0];
 TSR=8;
