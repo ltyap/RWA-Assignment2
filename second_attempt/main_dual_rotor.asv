@@ -23,9 +23,9 @@ N = 20;
 spacing=1; % 1- uniform, 0-cosine 
 sec_rot=1;  % is there a second rotor
 a_wake_bem = 0.2602;
-Nrotations = 1; %number of rotations done by the rotor (length of wake)
-L = [1,2,5,1000]*D; % distance between rotors
-% L=[1,2]*D;
+Nrotations = 10; %number of rotations done by the rotor (length of wake)
+% L = [1,2,5,1000]*D; % distance between rotors
+L=[1,2,5]*D;
 phase_diff = 0; % in degrees
 
 %% calculations
@@ -36,5 +36,5 @@ for i=1:length(L)
     filenames{i} = filename;
     save(filename,'results');
 end
-var_change = "L";% variable that changes - for plot legend
+var_change = "";% variable that changes - for plot legend
 plot_compare(filenames, L, var_change, N, rotor, rho, windvel);

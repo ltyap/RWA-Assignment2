@@ -1,14 +1,12 @@
+function plot_BEM_vs_LLT(windvel, TSR, Radius, NBlades, rho)
 %% plotting BEM vs LLT
+Omega = norm(windvel)*TSR/Radius;
 
-windvel = [10,0,0];
-TSR=8;
-Radius=50;
-Omega=norm(windvel)*TSR/Radius;
-NBlades=3;
-
-load('results_llt_N20.mat')
+results_llt = load("results/results_llt_N20.mat");
+results_llt = results_llt.results;
 llt_N = length(results_llt)/NBlades;
-load('results_bem_N20.mat');
+results_bem = load('results/results_bem_N20.mat');
+results_bem = results_bem.results_bem;
 bem_N = length(results_bem);
 
 colors = ['r'; 'b'; 'g'; 'm'; 'y']; % define color scheme, more colors need to be added for larger analysis
@@ -17,6 +15,11 @@ results_bem(:,9) = rad2deg(results_bem(:,9));
 results_llt(:,9) = rad2deg(results_llt(:,9));
 % non-dimensionalize circulation - only for llt!
 results_llt(:,7) = results_llt(:,7)/(pi*norm(windvel)^2/(NBlades*Omega));
+% non-dimensionalize Fnorm and Ftan
+results_llt(:,10) = results_llt(:,10)/(0.5*rho*norm(windvel)^2*Radius);
+results_llt(:,11) = results_llt(:,11)/(0.5*rho*norm(windvel)^2*Radius);
+results_bem(:,10) = results_bem(:,10)/(0.5*rho*norm(windvel)^2*Radius);
+results_bem(:,11) = results_bem(:,11)/(0.5*rho*norm(windvel)^2*Radius);
 
 %% a
 figure()
@@ -121,7 +124,7 @@ figure()
 hold on
 plot(results_llt(1:llt_N,1), results_llt(1:llt_N,10), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
 plot(results_bem(:,1), results_bem(:,10), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
-title('Fnorm')
+title('Normal force (non-dimensionalized by 1/2 \rho U_\infty^2 R)')
 grid on
 grid minor
 xlabel('r/R')
@@ -133,9 +136,10 @@ figure()
 hold on
 plot(results_llt(1:llt_N,1), results_llt(1:llt_N,11), '-', 'Color', colors(1), 'DisplayName',sprintf('LLT'))
 plot(results_bem(:,1), results_bem(:,11), '--', 'Color', colors(2), 'DisplayName',sprintf('BEM'))
-title('Ftan')
+title('Tangential force (non-dimensionalized by 1/2 \rho U_\infty^2 R)')
 grid on
 grid minor
 xlabel('r/R')
 legend show
 hold off
+end

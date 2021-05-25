@@ -1,16 +1,5 @@
 % 3D velocity induced by a vortex filament
 function u_ind = v_3D_from_vortex(gamma, point1, point2, cp, CORE)
-% function to calculate the velocity induced by a straight 3D vortex filament
-% with circulation GAMMA at a point VP1. The geometry of the vortex filament
-% is defined by its edges: the filament starts at [X1, Y1, Z1] and ends at [X2, Y2, Z2].
-% [XP, YP, ZP] denote the coordinates of target point where the velocity is calculated
-% the input CORE defines a vortex core radius, inside which the velocity
-% is defined as a solid body rotation.
-% The function is adapted from the algorithm presented in:
-%                Katz, Joseph, and Allen Plotkin. Low-speed aerodynamics.
-%                Vol. 13. Cambridge university press, 2001.
-
-
 % calculate geometric relations for integral of the velocity induced by filament
 point1 = point1(:);
 point2 = point2(:);

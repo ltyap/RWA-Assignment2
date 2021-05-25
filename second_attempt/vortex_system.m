@@ -1,4 +1,4 @@
-function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlades,sec_rot,L)
+function [results]=vortex_system(r_R, Radius, tipspeedratio, theta_array, NBlades,sec_rot,L, phase_diff)
 [c, twist_distribution] = BladeGeometry(r_R);
 twist = -deg2rad(twist_distribution);
 cp_chord = (c(1:end-1)+c(2:end))/2;
@@ -125,8 +125,8 @@ else
 end
  
 if sec_rot==1 % 2nd rotor
-    SeparationDist = L;%2*(2*Radius);
-    phase = deg2rad(0);
+    SeparationDist = L;
+    phase = deg2rad(phase_diff);
     cosphase = cos(phase);
     sinephase = sin(phase);
     

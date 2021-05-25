@@ -105,4 +105,30 @@ grid minor
 xlabel('r/R')
 legend show
 hold off
+
+%% Fnorm
+figure()
+hold on
+for i=1:length(name_array)
+    plot(results(1:N,1,i), results(1:N,10,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('phase diff = %.0f', name_array(i)))
+end
+title('Normal force (non-dimensionalized by 1/2 \rho U_\infty^2 R)')
+grid on
+grid minor
+xlabel('r/R')
+legend show
+hold off
+
+%% Ftan
+figure()
+hold on
+for i=1:length(name_array)
+    plot(results(1:N,1,i), results(1:N,11,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('phase diff = %.0f', name_array(i)))
+end
+title('Tangential force (non-dimensionalized by 1/2 \rho U_\infty^2 R)')
+grid on
+grid minor
+xlabel('r/R')
+legend show
+hold off
 end
