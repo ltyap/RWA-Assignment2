@@ -1,4 +1,4 @@
-function [CT,CP,CQ, results] = lifting_line_loop(N,spacing,L, sec_rot, a_wake, Nrotations)
+function [CT,CP,CQ, results,conv] = lifting_line_loop(N,spacing,L, sec_rot, a_wake, Nrotations)
 %% Assignment 2 of RWA - lifting line model
 %% define the blade geometry - same as in BEM model
 % blade discretisation
@@ -31,7 +31,7 @@ Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 RotorWakeSystem = vortex_system(r_R, Radius, TSR/(1-a_wake), theta_array, NBlades,sec_rot,L);
 
 [InfluenceMatrix] = influence_matrix(RotorWakeSystem);
-[a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow, conv]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel);
+[a, aline, r_R_cp, Fnorm, Ftan, GammaNew, alpha, inflow, conv]= solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, windvel,L, sec_rot,N, NBlades);
 %QUICKFIX
 if sec_rot==1
     r_R_cp = [r_R_cp(1:N*NBlades);r_R_cp(1:N*NBlades)];

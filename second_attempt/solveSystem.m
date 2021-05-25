@@ -1,4 +1,4 @@
-function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow, i] = solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, wind)
+function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow, i] = solveSystem(InfluenceMatrix, RotorWakeSystem, Radius, Omega, wind,L,sec_rot,N, NBlades)
     
     UMat = InfluenceMatrix.U;
     VMat = InfluenceMatrix.V;
@@ -26,6 +26,9 @@ function [a, aline, r_R, Fnorm, Ftan, GammaNew, Alpha, Inflow, i] = solveSystem(
         % calculate velocity, circulation and loads at the controlpoints
         for icp= 1:Ncp  % loop over all control points
             localcp = bound.cpcoord(:,icp);
+            if sec_rot==1 & icp>N*NBlades % if second rotor - take middle of rotor to 0,0,0 for force calculation
+                localcp = localcp - [0;L;0];
+            end
             % determine radial position of the controlpoint;
             radialpos = bound.cp_radialpos(icp);%[m]
             u=0; % initialize velocity at control point

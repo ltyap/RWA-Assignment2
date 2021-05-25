@@ -126,7 +126,7 @@ end
  
 if sec_rot==1 % 2nd rotor
     SeparationDist = L;%2*(2*Radius);
-    phase = deg2rad(80);
+    phase = deg2rad(0);
     cosphase = cos(phase);
     sinephase = sin(phase);
     
