@@ -20,6 +20,7 @@ altitude = 0;   %[km]
 %% operational conditions
 D = 2*rotor.Radius;
 N = 20;
+Nwake = 201;    % nr of wake discretization
 spacing=1; % 1- uniform, 0-cosine 
 sec_rot=1;  % is there a second rotor
 a_wake_bem = 0.2602;
@@ -31,7 +32,7 @@ phase_diff = 0; % in degrees
 %% calculations
 names={};
 for i=1:length(L)
-    [CT(i,:),CP(i,:),CQ(i,:), results] = lifting_line_loop(rotor,windvel,N,spacing,L(i),sec_rot, a_wake_bem, Nrotations, phase_diff);
+    [CT(i,:),CP(i,:),CQ(i,:), results] = lifting_line_loop(rotor,windvel,N,spacing,L(i),sec_rot, a_wake_bem, Nrotations, Nwake, phase_diff);
     filename = "results/results_dual_llt_N"+N+"_phase_"+phase_diff+"_L"+L(i)+".mat";
     filenames{i} = filename;
     save(filename,'results');

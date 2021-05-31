@@ -1,4 +1,4 @@
-function [CT,CP,CQ, results,conv] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake, Nrotations, phase_diff)
+function [CT,CP,CQ, results,conv] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake, Nrotations, Nwake, phase_diff)
 TipLocation_R = rotor.TipLocation_R; 
 RootLocation_R = rotor.RootLocation_R; 
 TSR = rotor.TSR;        
@@ -8,7 +8,8 @@ NBlades = rotor.NBlades;
 
 Omega = norm(windvel)*TSR/Radius;
 
-theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
+% theta_array = [0:pi/10:2*pi*Nrotations];%Omega*t, where t is the time
+theta_array = linspace(0, 2*pi*Nrotations, Nwake);
 % Lw_D:  wake length in diameters downstream
 Lw_D = max(theta_array)/Omega*norm(windvel)*(1-a_wake)/(2*Radius); % [-]
 

@@ -1,4 +1,5 @@
 function plot_compare(filenames, name_array, var_change, N, rotor, rho, windvel)
+spacing_names={'cosine', 'uniform'}
 NBlades=rotor.NBlades;
 TSR=rotor.TSR;
 Radius=rotor.Radius;
@@ -25,7 +26,7 @@ results(:,11,:) = results(:,11,:)/(0.5*rho*norm(windvel)^2*Radius);
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,2,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,2,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Axial induction')
 grid on
@@ -38,7 +39,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,3,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,3,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Tangential induction')
 grid on
@@ -51,7 +52,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,8,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,8,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Angle of attack \alpha [\circ]')
 grid on
@@ -64,7 +65,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,9,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,9,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Angle of inflow [\circ]')
 grid on
@@ -77,7 +78,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,4,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,4,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('C_T')
 grid on
@@ -90,7 +91,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,5,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,5,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('C_P')
 grid on
@@ -103,7 +104,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,6,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,6,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('C_Q')
 grid on
@@ -118,7 +119,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,7,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,7,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Circulation distribution (non-dimensionalized by \pi U_\infty^2 / \Omega N_{blades})')
 grid on
@@ -131,7 +132,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,10,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,10,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Normal force (non-dimensionalized by 1/2 \rho U_\infty^2 R)')
 grid on
@@ -144,7 +145,7 @@ hold off
 figure()
 hold on
 for i=1:length(name_array)
-    plot(results(1:N,1,i), results(1:N,11,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s = %.0f', var_change,name_array(i)))
+    plot(results(1:N,1,i), results(1:N,11,i), 'linestyle',styles{i}, 'Color', colors(i), 'DisplayName',sprintf('%s', spacing_names{i}))
 end
 title('Tangential force (non-dimensionalized by 1/2 \rho U_\infty^2 R)')
 grid on

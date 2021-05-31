@@ -21,13 +21,14 @@ altitude = 0;   %[km]
 %% other parameters
 a_wake_bem = 0.2602;
 N = 20; % nr of blade segments
+Nwake = 201 ; % nr of wake discretization
 spacing = 1; % 1- uniform, 0-cosine
 L = 0;    % distance between 2 rotors
 sec_rot=0;  % is there a second rotor
 phase_diff = 0;
 Nrotations = 10; %number of rotations done by the rotor (length of wake)
 
-[CT,CP,CQ, results] = lifting_line_loop(rotor,windvel,N,spacing,L, sec_rot, a_wake_bem, Nrotations);
+[CT,CP,CQ, results] = lifting_line_loop(rotor,windvel,N,spacing,L, sec_rot, a_wake_bem, Nrotations, Nwake, phase_diff);
 filename = "results/results_llt_N"+N+".mat";
 save(filename,'results');
 
@@ -39,7 +40,7 @@ plot_BEM_vs_LLT(windvel, rotor.TSR, rotor.Radius, rotor.NBlades, rho);
 a_wake = [0,0.25,a_wake_bem, 0.5,0.75];
 filenames={};
 for i=1:length(a_wake)
-    [CT_a(i),CP_a(i),CQ_a(i), results] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake(i), Nrotations, phase_diff)
+    [CT_a(i),CP_a(i),CQ_a(i), results] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake(i), Nrotations, Nwake, phase_diff)
     filename = "results/results_llt_N"+N+"a_"+a_wake(i)+".mat";
     filenames{i} = filename;
     save(filename,'results');
@@ -48,11 +49,11 @@ var_change = "a_{wake}";% variable that changes - for plot legend
 plot_compare(filenames, a_wake, var_change, N, rotor, rho, windvel);
 
 % discretization of the blade (constant, cosine) azimuthal discretization 
-% (number of wake segments per rotation)
+
 spacing=[0,1];
 filenames={};
 for i=1:length(spacing)
-    [CT_cos(i),CP_cos(i),CQ_cos(i),results] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake_bem, Nrotations, phase_diff);
+    [CT_cos(i),CP_cos(i),CQ_cos(i),results] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake_bem, Nrotations, Nwake, phase_diff);
     filename = "results/results_llt_N"+N+"cos_"+spacing(i)+".mat";
     filenames{i} = filename;
     save(filename,'results');
@@ -65,10 +66,36 @@ plot_compare(filenames, spacing, var_change, N, rotor, rho, windvel);
 spacing=1;
 Nrotations = [0.1, 1, 5,10,15];
 for i=1:length(Nrotations)
-    [CT_rot(i),CP_rot(i),CQ_rot(i),results, conv(i)] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake_bem, Nrotations(i), phase_diff);
+    tic
+    [CT_rot(i),CP_rot(i),CQ_rot(i),results, conv(i)] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake_bem, Nrotations(i), Nwake, phase_diff);
+    time(i)=toc;
     filename = "results/results_llt_N"+N+"rot_"+Nrotations(i)+".mat";
     filenames{i} = filename;
     save(filename,'results');
 end
 var_change = "N_{rotations}";% variable that changes - for plot legend
 plot_compare(filenames, Nrotations, var_change, N, rotor, rho, windvel);
+
+%convergence
+figure()
+hold on
+plot(Nrotations, conv, '-o')
+title('Number of iterations for convergence')
+grid on
+grid minor
+xlabel('N_{rotations}')
+hold off
+
+
+% (number of wake segments per rotation)
+Nwake = [10,20,50,100,200];
+Nrotations = 10;
+filenames={};
+for i=1:length(Nwake)
+    [CT_wake(i),CP_wake(i),CQ_wake(i),results] = lifting_line_loop(rotor, windvel, N,spacing,L, sec_rot, a_wake_bem, Nrotations, Nwake(i), phase_diff);
+    filename = "results/results_llt_N"+N+"Nwake_"+Nwake(i)+".mat";
+    filenames{i} = filename;
+    save(filename,'results');
+end
+var_change = "N_{wake}";% variable that changes - for plot legend
+plot_compare(filenames, Nwake, var_change, N, rotor, rho, windvel);
