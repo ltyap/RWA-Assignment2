@@ -1,11 +1,14 @@
-function [fnorm , ftan, gamma, alpha, inflowangle] = loadBladeElement(r_R, chord, twist, polar_alpha, polar_cl, polar_cd, Uaxial, Utan)
+function [fnorm , ftan, gamma, alpha, inflowangle] = loadBladeElement(Utan, Uaxial, r_R)
 % calculates the load in the blade element
 vmag2 = Uaxial.^2 + Utan.^2;    % square of resultant velocity
 inflowangle = atan2(Uaxial, Utan);  % calculate inflow angle
+[chord, twist] = BladeGeometry(r_R);
 alpha = twist + rad2deg(inflowangle);     % calculate angle of attack
 
-cl = interp1(polar_alpha, polar_cl, alpha);     % local cl from airfoil polars
-cd = interp1(polar_alpha, polar_cd, alpha);     % local cd from airfoil polars
+[polar_alpha, polar_cl, polar_cd] = import_polars();
+
+cl = interp1(polar_alpha, polar_cl, alpha,'linear','extrap');     % local cl from airfoil polars
+cd = interp1(polar_alpha, polar_cd, alpha,'linear','extrap');     % local cd from airfoil polars
 
 % if alpha  is out of the polar range - take maximum or minimum given value
 % - not exactly physical
